@@ -5,7 +5,7 @@
  *      Author: ludwig
  */
 
-#include "ocltypes.h"
+#include "oclbtypes.h"
 
 const char *opencl_types = ""
 #if OCL_DOUBLE_SUPPORTED == 1

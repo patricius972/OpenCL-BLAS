@@ -1,16 +1,16 @@
-# This is needed for fallbacks in situations where OpenCL does not 
-# support double precision...
-include_directories (
- ${PROJECT_SOURCE_DIR}/src/plugins/atlas/lib
+INCLUDE(${PROJECT_SOURCE_DIR}/config/library_dirs.txt)	
+INCLUDE(${PROJECT_SOURCE_DIR}/config/libraries.txt)	
+INCLUDE(${PROJECT_SOURCE_DIR}/config/include_dirs.txt)	
+
+include_directories(
+	.
 )
 
 link_libraries(${target}
-	upla-base
-	upla-atlas
 	rt
-	upla-opencl
 )
 
+add_subdirectory(opencl)
 add_subdirectory(oclutils)
 #add_subdirectory(blas1)
 #add_subdirectory(blas2)
@@ -19,6 +19,7 @@ add_subdirectory(blas3)
 set(target oclblas)
 
 link_libraries(${target}
+	opencl
 	oclutils
 #	oclblas1
 #	oclblas2

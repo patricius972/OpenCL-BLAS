@@ -7,14 +7,49 @@
 
 #include "gemm.h"
 
-
-UplaStatus opencl_sgemm(const MatrixOrder order, const Transpose transposeA,
-		const Transpose transposeB, const int m, const int n, const int k,
-		const float alpha, float *a, const int lda, float *b, const int ldb,
-		const float beta, float *c, const int ldc)
+OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
+		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+		const int m, const int n, const int k, const float alpha, float *a,
+		const int lda, float *b, const int ldb, const float beta, float *c,
+		const int ldc)
 {
 	cl_int ret;
-	UplaStatus status = FAILURE;
+	OpenCLStatus status = FAILURE;
+
+	cl_device_id usedDevice = deviceIds[1][0];
+	fprintf(stdout, "SELECTED DEVICE:\n");
+	printDeviceInformation(usedDevice);
+
+	cl_context usedContext = clCreateContext(NULL, 1, &usedDevice, NULL, NULL,
+			&ret);
+	ERROR_HANDLER(ret);
+
+	cl_command_queue usedCommandQueue = clCreateCommandQueue(usedContext,
+			usedDevice, 0, &ret);
+	ERROR_HANDLER(ret);
+
+	/* Create Kernel Program from the source */
+
+	char definitions[256];
+	sprintf(definitions, "#define SUBMATRIX_SIZE %i\n", SUBMATRIX_SIZE);
+	fprintf(stdout, "%s", definitions);
+
+	const size_t sizes[] =
+	{ strlen(definitions), strlen(opencl_types), strlen(opencl_sgemm_kernel),
+			strlen(opencl_dgemm_kernel) };
+	const char *sources[] =
+	{ definitions, opencl_types, opencl_sgemm_kernel, opencl_dgemm_kernel };
+	cl_program program = clCreateProgramWithSource(usedContext, 4, sources,
+			sizes, &ret);
+	ERROR_HANDLER(ret);
+
+	/* Build Kernel Program */
+	ret = clBuildProgram(program, 1, &usedDevice, NULL, NULL, NULL);
+	if (ret != CL_SUCCESS)
+	{
+		printProgramBuildInfo(ret, program, usedDevice);
+		ERROR_HANDLER(ret);
+	}
 
 	cl_mem memA = NULL;
 	cl_mem memB = NULL;
@@ -88,6 +123,19 @@ UplaStatus opencl_sgemm(const MatrixOrder order, const Transpose transposeA,
 
 	FINISH:
 
+	clReleaseProgram(program);
+
+	if (usedCommandQueue != NULL)
+	{
+		clReleaseCommandQueue(usedCommandQueue);
+		usedCommandQueue = NULL;
+	}
+	if (usedContext != NULL)
+	{
+		clReleaseContext(usedContext);
+		usedContext = NULL;
+	}
+
 	if (memA != NULL)
 	{
 		clReleaseMemObject(memA);
@@ -104,10 +152,11 @@ UplaStatus opencl_sgemm(const MatrixOrder order, const Transpose transposeA,
 	return status;
 }
 
-UplaStatus opencl_dgemm(const MatrixOrder order, const Transpose transposeA,
-		const Transpose transposeB, const int m, const int n, const int k,
-		const double alpha, double *a, const int lda, double *b, const int ldb,
-		const double beta, double *c, const int ldc)
+OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
+		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+		const int m, const int n, const int k, const double alpha, double *a,
+		const int lda, double *b, const int ldb, const double beta, double *c,
+		const int ldc)
 {
 #if OCL_DOUBLE_SUPPORTED == 1
 	cl_int ret;
@@ -282,23 +331,24 @@ UplaStatus opencl_dgemm(const MatrixOrder order, const Transpose transposeA,
 
 	return SUCCESS;
 #else
-	return atlas_dgemm(order, transposeA, transposeB, m, n, k, alpha, a, lda,
-			b, ldb, beta, c, ldc);
+	return ARCHITECTURE_MISMATCH;
 #endif
 }
 
-UplaStatus opencl_cgemm(const MatrixOrder order, const Transpose transposeA,
-		const Transpose transposeB, const int m, const int n, const int k,
-		const void *alpha, void *a, const int lda, void *b, const int ldb,
-		const void *beta, void *c, const int ldc)
+OpenCLStatus opencl_cgemm(const OCLBMatrixOrder order,
+		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+		const int m, const int n, const int k, const void *alpha, void *a,
+		const int lda, void *b, const int ldb, const void *beta, void *c,
+		const int ldc)
 {
 	return NOT_IMPLEMENTED;
 }
 
-UplaStatus opencl_zgemm(const MatrixOrder order, const Transpose transposeA,
-		const Transpose transposeB, const int m, const int n, const int k,
-		const void *alpha, void *a, const int lda, void *b, const int ldb,
-		const void *beta, void *c, const int ldc)
+OpenCLStatus opencl_zgemm(const OCLBMatrixOrder order,
+		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+		const int m, const int n, const int k, const void *alpha, void *a,
+		const int lda, void *b, const int ldb, const void *beta, void *c,
+		const int ldc)
 {
 	return NOT_IMPLEMENTED;
 }

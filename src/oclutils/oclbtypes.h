@@ -5,10 +5,20 @@
  *      Author: ludwig
  */
 
-#ifndef OCLTYPES_H_
-#define OCLTYPES_H_
+#ifndef OCLBTYPES_H_
+#define OCLBTYPES_H_
 
 #include <oclconfig.h>
+
+typedef enum
+{
+	ColumnMajor, RowMajor
+} OCLBMatrixOrder;
+
+typedef enum
+{
+	NO, YES
+} OCLBTranspose;
 
 const char *opencl_types;
 

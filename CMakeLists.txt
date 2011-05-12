@@ -17,21 +17,20 @@ cmake_minimum_required(VERSION 2.6)
 # set global project information into variables...
 # (to be changed)
 #
-set(PROJECT_NAME      "UPLA")     # no spaces allowed!
-set(PROJECT_LONG_NAME "United Platform Linear Algebra Package") # long name if needed
-set(PROJECT_FS_NAME   "upla")     # changed name for file system
+set(PROJECT_NAME      "OCLBLAS")     # no spaces allowed!
+set(PROJECT_LONG_NAME "OpenCL Basic Linear Algebra Subroutines") # long name if needed
+set(PROJECT_FS_NAME   "oclblas")     # changed name for file system
 set(PROJECT_VERSION   "0.0.1")
 set(PROJECT_AUTHOR    "Rick-Rainer Ludwig")
 set(PROJECT_OWNER     "Rick-Rainer Ludwig")
 set(PROJECT_LIFE_TIME "2011")
 set(PROJECT_BUGS_TO   "ludwig@puresol-technologies.com")
-set(PARALLEL_MODE     "1")               # set 1 for enabled and 0 for disabled
 
 #
 # set project type... (C CXX Java)
 # (to be changed)
 #
-set(PROJECT_TYPE C CXX)
+set(PROJECT_TYPE C)
 enable_testing()
 
 # set project name...

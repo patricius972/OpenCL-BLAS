@@ -1,19 +1,10 @@
-#ifndef UPLABASE_TYPES_H
-#define UPLABASE_TYPES_H
+#ifndef OPENCL_TYPES_H
+#define OPENCL_TYPES_H
 
 typedef enum
 {
 	SUCCESS, NOT_IMPLEMENTED, FAILURE, ARCHITECTURE_MISMATCH
-} UplaStatus;
+} OpenCLStatus;
 
-typedef enum
-{
-	ColumnMajor, RowMajor
-} MatrixOrder;
-
-typedef enum
-{
-	NO, YES
-} Transpose;
 
 #endif

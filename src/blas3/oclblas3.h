@@ -8,6 +8,6 @@
 #ifndef OPENCL_BLAS3_H
 #define OPENCL_BLAS3_H
 
-#include "gemm.h"
+#include "gemm/gemm.h"
 
 #endif

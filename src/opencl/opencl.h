@@ -17,15 +17,13 @@
 #include <CL/cl.h>
 #endif
 
-#include <uplabase/types.h>
-
-#include <oclblas/oclutils/ocltypes.h>
-#include <oclblas/blas3/gemm_kernels.h>
+#include <blas3/gemm/gemm_kernels.h>
 
 #include "opencl_utils.h"
 #include "opencl_platform.h"
 #include "opencl_device.h"
 #include "opencl_kernel.h"
+#include "opencl_types.h"
 
 cl_uint numPlatforms;
 cl_platform_id *platformIds;
@@ -33,18 +31,12 @@ cl_platform_id *platformIds;
 cl_uint *numDevices;
 cl_device_id **deviceIds;
 
-cl_device_id usedDevice;
-cl_context usedContext;
-cl_command_queue usedCommandQueue;
-
-cl_program program;
-
 void getErrorMessage(cl_int returnValue, size_t maxLength, char *msg);
 
-UplaStatus
+OpenCLStatus
 opencl_initPlatform();
 
-UplaStatus
+OpenCLStatus
 opencl_dropPlatform();
 
 #endif /* OPENCL_H_ */

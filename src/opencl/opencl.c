@@ -7,9 +7,9 @@
 
 #include "opencl.h"
 
-UplaStatus opencl_initPlatform()
+OpenCLStatus opencl_initPlatform()
 {
-	UplaStatus status = FAILURE;
+	OpenCLStatus status = FAILURE;
 
 	numPlatforms = getPlatformNum();
 	platformIds = malloc(numPlatforms * sizeof(*platformIds));
@@ -33,58 +33,12 @@ UplaStatus opencl_initPlatform()
 			printDeviceInformation(deviceIds[platform][device]);
 		}
 	}
-
-	usedDevice = deviceIds[1][0];
-	fprintf(stdout, "SELECTED DEVICE:\n");
-	printDeviceInformation(usedDevice);
-
-	cl_int ret;
-	usedContext = clCreateContext(NULL, 1, &usedDevice, NULL, NULL, &ret);
-	ERROR_HANDLER(ret)
-
-	usedCommandQueue = clCreateCommandQueue(usedContext, usedDevice, 0, &ret);
-	ERROR_HANDLER(ret);
-
-	/* Create Kernel Program from the source */
-
-	char definitions[256];
-	sprintf(definitions, "#define SUBMATRIX_SIZE %i\n", SUBMATRIX_SIZE);
-	fprintf(stdout, "%s", definitions);
-
-	const size_t sizes[] =
-	{ strlen(definitions), strlen(opencl_types), strlen(opencl_sgemm_kernel),
-			strlen(opencl_dgemm_kernel) };
-	const char *sources[] =
-	{ definitions, opencl_types, opencl_sgemm_kernel, opencl_dgemm_kernel };
-	program = clCreateProgramWithSource(usedContext, 4, sources, sizes, &ret);
-	ERROR_HANDLER(ret);
-
-	/* Build Kernel Program */
-	ret = clBuildProgram(program, 1, &usedDevice, NULL, NULL, NULL);
-	if (ret != CL_SUCCESS)
-	{
-		printProgramBuildInfo(ret, program, usedDevice);
-		ERROR_HANDLER(ret);
-	}
-
 	status = SUCCESS;
 	FINISH: return status;
 }
 
-UplaStatus opencl_dropPlatform()
+OpenCLStatus opencl_dropPlatform()
 {
-	clReleaseProgram(program);
-
-	if (usedCommandQueue != NULL)
-	{
-		clReleaseCommandQueue(usedCommandQueue);
-		usedCommandQueue = NULL;
-	}
-	if (usedContext != NULL)
-	{
-		clReleaseContext(usedContext);
-		usedContext = NULL;
-	}
 	if (deviceIds != NULL)
 	{
 		for (unsigned int i = 0; i < numPlatforms; ++i)
