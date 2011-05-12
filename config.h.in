@@ -1,0 +1,24 @@
+/*****************************************************************************
+ *
+ * This is a CMake template file to create a config.h file for software build.
+ *
+ * Author:  Rick-Rainer Ludwig
+ * Version: 1.0.1
+ * Date:    2008-11-08 14:35:00
+ *
+ *****************************************************************************/
+
+#define PACKAGE_NAME      "${PROJECT_NAME}"
+#define PACKAGE_LONG_NAME "${PROJECT_LONG_NAME}"
+#define PACKAGE_VERSION   "${PROJECT_VERSION}"
+#define PACKAGE_AUTHOR    "${PROJECT_AUTHOR}"
+#define PACKAGE_OWNER     "${PROJECT_OWNER}"
+#define PACKAGE_YEARS     "${PROJECT_LIFE_TIME}"
+#define PACKAGE_BUGREPORT "${PROJECT_BUGS_TO}"
+#define PACKAGE_FS_NAME   "${PROJECT_FS_NAME}"
+
+#define BIN_DIRECTORY     "${CMAKE_INSTALL_PREFIX}/bin"
+#define LIB_DIRECTORY     "${CMAKE_INSTALL_PREFIX}/lib"
+#define SHARE_DIRECTORY   "${SHARE_DIRECTORY}"
+
+#define PARALLEL_MODE     ${PARALLEL_MODE}

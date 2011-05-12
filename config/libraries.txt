@@ -1,0 +1,4 @@
+link_libraries(
+	# Libraries for CuBLAS
+	OpenCL
+)
