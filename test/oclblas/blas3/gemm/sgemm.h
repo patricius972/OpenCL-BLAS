@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-#include <trimp/trimp_blas.h>
+#include <trimp/trimpblas.h>
 
 #include <oclblas/oclblas.h>
 #include <oclblas/output.h>

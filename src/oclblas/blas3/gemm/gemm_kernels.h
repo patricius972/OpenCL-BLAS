@@ -1,8 +1,6 @@
 #ifndef SGEMM_CL_H
 #define SGEMM_CL_H
 
-#define SUBMATRIX_SIZE 16
-
 const char *opencl_sgemm_kernel;
 const char *opencl_dgemm_kernel;
 const char *opencl_cgemm_kernel;

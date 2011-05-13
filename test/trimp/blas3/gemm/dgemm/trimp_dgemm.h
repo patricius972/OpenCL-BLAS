@@ -15,7 +15,7 @@
 
 #include <testutils/compare.h>
 
-#include <trimp/trimp_blas.h>
+#include <trimp/trimpblas.h>
 
 int
 testDgemmColMajorNoTransNoTrans_3x3();

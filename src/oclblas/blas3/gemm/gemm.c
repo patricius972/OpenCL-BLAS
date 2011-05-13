@@ -30,16 +30,17 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 
 	/* Create Kernel Program from the source */
 
+	const int SUBMATRIX_SIZE = 16;
+
 	char definitions[256];
 	sprintf(definitions, "#define SUBMATRIX_SIZE %i\n", SUBMATRIX_SIZE);
 	fprintf(stdout, "%s", definitions);
 
 	const size_t sizes[] =
-	{ strlen(definitions), strlen(opencl_types), strlen(opencl_sgemm_kernel),
-			strlen(opencl_dgemm_kernel) };
+	{ strlen(definitions), strlen(opencl_types), strlen(opencl_sgemm_kernel) };
 	const char *sources[] =
-	{ definitions, opencl_types, opencl_sgemm_kernel, opencl_dgemm_kernel };
-	cl_program program = clCreateProgramWithSource(usedContext, 4, sources,
+	{ definitions, opencl_types, opencl_sgemm_kernel };
+	cl_program program = clCreateProgramWithSource(usedContext, 3, sources,
 			sizes, &ret);
 	ERROR_HANDLER(ret);
 
