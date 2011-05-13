@@ -8,8 +8,6 @@
 #ifndef OCLBTYPES_H_
 #define OCLBTYPES_H_
 
-#include <oclconfig.h>
-
 typedef enum
 {
 	ColumnMajor, RowMajor

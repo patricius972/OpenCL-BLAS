@@ -8,8 +8,8 @@
 #ifndef TRIMP_BLAS_H
 #define TRIMP_BLAS_H
 
-#include "trimp_blas1.h"
-#include "trimp_blas2.h"
-#include "trimp_blas3.h"
+#include "blas1/trimp_blas1.h"
+#include "blas2/trimp_blas2.h"
+#include "blas3/trimp_blas3.h"
 
 #endif

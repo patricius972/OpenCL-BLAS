@@ -8,10 +8,12 @@
 #ifndef TRIMPDGEMM_H
 #define TRIMPDGEMM_H
 
+#include <stdio.h>
 #include <stdlib.h>
 
-#include <uplabase/output.h>
-#include <uplabase/compare.h>
+#include <oclblas/output.h>
+
+#include <testutils/compare.h>
 
 #include <trimp/trimp_blas.h>
 

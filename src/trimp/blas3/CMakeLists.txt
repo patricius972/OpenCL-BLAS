@@ -1,6 +1,6 @@
 add_subdirectory(gemm)
 
-set(target trimp-blas3)
+set(target trimpblas3)
 
 file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)

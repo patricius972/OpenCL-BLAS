@@ -17,8 +17,6 @@
 #include <CL/cl.h>
 #endif
 
-#include <blas3/gemm/gemm_kernels.h>
-
 #include "opencl_utils.h"
 #include "opencl_platform.h"
 #include "opencl_device.h"

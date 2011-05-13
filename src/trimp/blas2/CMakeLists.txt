@@ -1,4 +1,4 @@
-set(target trimp-blas2)
+set(target trimpblas2)
 
 file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)

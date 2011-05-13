@@ -10,11 +10,12 @@
 
 #include <stdlib.h>
 
-#include <uplabase/output.h>
-#include <uplabase/compare.h>
-
 #include <trimp/trimp_blas.h>
+
 #include <oclblas/oclblas.h>
+#include <oclblas/output.h>
+
+#include <testutils/compare.h>
 
 int
 testSgemmColMajorNoTransNoTrans_3x3();

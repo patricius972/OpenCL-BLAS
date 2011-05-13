@@ -10,14 +10,14 @@
 
 #include <stdio.h>
 
-#include "types.h"
+#include <oclblas/types.h>
 
 void
-printMatrixS(const MatrixOrder order, const int m, const int n, float *a,
+printMatrixS(const OCLBMatrixOrder order, const int m, const int n, float *a,
 		const int lda);
 
 void
-printMatrixD(const MatrixOrder order, const int m, const int n, double *a,
+printMatrixD(const OCLBMatrixOrder order, const int m, const int n, double *a,
 		const int lda);
 
 #endif

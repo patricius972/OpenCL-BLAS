@@ -10,9 +10,10 @@
 
 #include <stdlib.h>
 
-#include <uplabase/output.h>
-#include <uplabase/compare.h>
-#include <uplabase/types.h>
+#include <oclblas/output.h>
+#include <oclblas/types.h>
+
+#include <testutils/compare.h>
 
 #include <trimp/trimp_blas.h>
 

@@ -9,12 +9,13 @@
 #define OPENCL_BLAS3_GEMM_H_
 
 #include <stdio.h>
-
 #include <time.h>
 
 #include <opencl/opencl.h>
 
-#include <oclutils/oclbtypes.h>
+#include <oclblas/types.h>
+
+#include "gemm_kernels.h"
 
 #define opencl_sgemm_effort() n_3
 #define opencl_dgemm_effort() n_3

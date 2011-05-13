@@ -135,19 +135,49 @@ OCLBLAS_BINARY_DIR:STATIC=/media/secured/home/ludwig/UniPlatLapack/oclblas
 OCLBLAS_SOURCE_DIR:STATIC=/media/secured/home/ludwig/UniPlatLapack/oclblas
 
 //Dependencies for the target
+oclblas1_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;
+
+//Dependencies for the target
+oclblas2_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;
+
+//Dependencies for the target
 oclblas3_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;general;oclgemm;
 
 //Dependencies for the target
-oclblas_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;general;opencl;general;oclutils;general;oclblas3;
+oclblas_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;general;opencl;general;oclblas1;general;oclblas2;general;oclblas3;
 
 //Dependencies for the target
 oclgemm_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;
 
 //Dependencies for the target
-oclutils_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;
+opencl_LIB_DEPENDS:STATIC=general;OpenCL;
+
+//Dependencies for target
+testutils_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+trimp-blas1_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+trimp-blas2_LIB_DEPENDS:STATIC=
 
 //Dependencies for the target
-opencl_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;
+trimp-blas3_LIB_DEPENDS:STATIC=general;trimp-gemm;
+
+//Dependencies for target
+trimp-gemm_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+trimpblas1_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+trimpblas2_LIB_DEPENDS:STATIC=
+
+//Dependencies for the target
+trimpblas3_LIB_DEPENDS:STATIC=general;trimp-gemm;
+
+//Dependencies for the target
+trimpblas_LIB_DEPENDS:STATIC=general;trimpblas1;general;trimpblas2;general;trimpblas3;
 
 
 ########################
@@ -229,7 +259,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=7
+CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=24
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -10,14 +10,14 @@
 
 #include <math.h>
 
-#include "types.h"
+#include <oclblas/types.h>
 
 int
-compareMatrixS(const MatrixOrder order, const int m, const int n, float *a,
+compareMatrixS(const OCLBMatrixOrder order, const int m, const int n, float *a,
 		const int lda, float *b, const int ldb, float accuracy);
 
 int
-compareMatrixD(const MatrixOrder order, const int m, const int n, double *a,
+compareMatrixD(const OCLBMatrixOrder order, const int m, const int n, double *a,
 		const int lda, double *b, const int ldb, double accuracy);
 
 #endif

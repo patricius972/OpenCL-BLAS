@@ -5,6 +5,7 @@
  *      Author: ludwig
  */
 
+#include <opencl/opencl_utils.h>
 #include <opencl/opencl.h>
 
 int main(int argc, char **argv)

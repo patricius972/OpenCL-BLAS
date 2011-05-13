@@ -8,6 +8,6 @@
 #ifndef TRIMP_BLAS3_H
 #define TRIMP_BLAS3_H
 
-#include "trimp_blas3_gemm.h"
+#include "gemm/trimp_gemm.h"
 
 #endif

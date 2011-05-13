@@ -60,7 +60,7 @@ void outputRight(unsigned int m, unsigned int maxM)
 	printf("\n");
 }
 
-void printMatrixS(const MatrixOrder order, const int m, const int n, float *a,
+void printMatrixS(const OCLBMatrixOrder order, const int m, const int n, float *a,
 		const int lda)
 {
 	for (int _m = 0; _m < m; ++_m)
@@ -81,7 +81,7 @@ void printMatrixS(const MatrixOrder order, const int m, const int n, float *a,
 	}
 }
 
-void printMatrixD(const MatrixOrder order, const int m, const int n, double *a,
+void printMatrixD(const OCLBMatrixOrder order, const int m, const int n, double *a,
 		const int lda)
 {
 	for (int _m = 0; _m < m; ++_m)
