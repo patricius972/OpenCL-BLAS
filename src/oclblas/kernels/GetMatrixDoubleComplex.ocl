@@ -1,0 +1,36 @@
+DoubleComplex getMatrixDoubleComplex(DoubleComplexMatrix mat, unsigned int row,
+		unsigned int col)
+{
+	if ((row >= mat.m) || (col >= mat.n))
+	{
+		return 0.0;
+	}
+	if (mat.colMajor == 0)
+	{
+		/* row major data access */
+		if (mat.transposed == 0)
+		{
+			/* non-transposed row major data access */
+			return mat.data[row * mat.stride + col];
+		}
+		else
+		{
+			/* transposed column major data access */
+			return mat.data[col * mat.stride + row];
+		}
+	}
+	else
+	{
+		/* column major data access */
+		if (mat.transposed == 0)
+		{
+			/* non-transposed column major data access */
+			return mat.data[col * mat.stride + row];
+		}
+		else
+		{
+			/* transposed column major data access */
+			return mat.data[row * mat.stride + col];
+		}
+	}
+}

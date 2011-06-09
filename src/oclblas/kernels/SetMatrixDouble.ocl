@@ -1,0 +1,36 @@
+void setMatrixDouble(DoubleMatrix mat, unsigned int row, unsigned int col,
+		double value)
+{
+	if ((row >= mat.m) || (col >= mat.n))
+	{
+		return;
+	}
+	if (mat.colMajor == 0)
+	{
+		/* row major data access */
+		if (mat.transposed == 0)
+		{
+			/* non-transposed row major data access */
+			mat.data[row * mat.stride + col] = value;
+		}
+		else
+		{
+			/* transposed column major data access */
+			mat.data[col * mat.stride + row] = value;
+		}
+	}
+	else
+	{
+		/* column major data access */
+		if (mat.transposed == 0)
+		{
+			/* non-transposed column major data access */
+			mat.data[col * mat.stride + row] = value;
+		}
+		else
+		{
+			/* transposed column major data access */
+			mat.data[row * mat.stride + col] = value;
+		}
+	}
+}

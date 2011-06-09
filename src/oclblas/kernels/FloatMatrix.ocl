@@ -1,0 +1,8 @@
+typedef struct {
+    unsigned int m;
+    unsigned int n;
+	int colMajor;
+	int transposed;
+	int stride;
+	__global float *data;
+} FloatMatrix;
