@@ -1,9 +1,20 @@
-#ifndef SGEMM_CL_H
-#define SGEMM_CL_H
+#ifndef GEMM_KERNELS_H
+#define GEMM_KERNELS_H
 
-const char *opencl_sgemm_kernel;
-const char *opencl_dgemm_kernel;
-const char *opencl_cgemm_kernel;
-const char *opencl_zgemm_kernel;
+/*****************************************************************************
+ * Auto-generated string constant from OpenCL source file
+ * './kernels/SGEMM.ocl'.
+ * This constant is used to put the OpenCL source within the binary and to
+ * hand it to the OpenCL compiler of the present devices.
+ ****************************************************************************/
+const char *oclSGEMM;
+
+/*****************************************************************************
+ * Auto-generated string constant from OpenCL source file
+ * './kernels/DGEMM.ocl'.
+ * This constant is used to put the OpenCL source within the binary and to
+ * hand it to the OpenCL compiler of the present devices.
+ ****************************************************************************/
+const char *oclDGEMM;
 
 #endif

@@ -267,26 +267,23 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
 	 * Performs:
 	 *
 	 * / 1 4 \ T   / 1 2 \   / 22 28 \
-   * | 2 5 |   * | 3 4 | = \ 49 64 /
+     * | 2 5 |   * | 3 4 | = \ 49 64 /
 	 * \ 3 6 /     \ 5 6 /
 	 *
 	 * This time the matrices are given row major!
 	 */
 
-	float *a = malloc(9 * sizeof(float));
+	float *a = malloc(6 * sizeof(float));
 	float *b = malloc(6 * sizeof(float));
 	float *c = malloc(4 * sizeof(float));
 	float *e = malloc(4 * sizeof(float));
 
 	a[0] = 1.0;
 	a[1] = 4.0;
-	a[2] = 0.0;
-	a[3] = 2.0;
-	a[4] = 5.0;
-	a[5] = 0.0;
-	a[6] = 3.0;
-	a[7] = 6.0;
-	a[8] = 0.0;
+	a[2] = 2.0;
+	a[3] = 5.0;
+	a[4] = 3.0;
+	a[5] = 6.0;
 
 	b[0] = 1.0;
 	b[1] = 2.0;
@@ -295,11 +292,11 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
 	b[4] = 5.0;
 	b[5] = 6.0;
 
-	trimp_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 3, b, 2, 0.0, e, 2);
+	trimp_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 2, b, 2, 0.0, e, 2);
 
 	printf("TEST: testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()\n");
 	printf("A =\n");
-	printMatrixS(RowMajor, 3, 2, a, 3);
+	printMatrixS(RowMajor, 3, 2, a, 2);
 	printf("B =\n");
 	printMatrixS(RowMajor, 3, 2, b, 2);
 
@@ -307,7 +304,7 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
 	printf("(Expected)\n");
 	printMatrixS(RowMajor, 2, 2, e, 2);
 
-	opencl_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 3, b, 2, 0.0, c, 2);
+	opencl_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 2, b, 2, 0.0, c, 2);
 
 	printf("(Actual)\n");
 	printMatrixS(RowMajor, 2, 2, c, 2);

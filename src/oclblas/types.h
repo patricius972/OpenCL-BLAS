@@ -10,14 +10,12 @@
 
 typedef enum
 {
-	ColumnMajor, RowMajor
+	RowMajor = 0, ColumnMajor = 1
 } OCLBMatrixOrder;
 
 typedef enum
 {
-	NO, YES
+	NO = 0, YES = 1
 } OCLBTranspose;
-
-const char *opencl_types;
 
 #endif /* OCLTYPES_H_ */

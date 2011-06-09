@@ -13,7 +13,9 @@
 
 #include <opencl/opencl.h>
 
+#include <oclblas/oclStdKernels.h>
 #include <oclblas/types.h>
+#include <oclblas/output.h>
 
 #include "gemm_kernels.h"
 

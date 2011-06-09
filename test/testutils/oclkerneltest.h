@@ -8,8 +8,6 @@
 #ifndef OCLKERNELTEST_H_
 #define OCLKERNELTEST_H_
 
-#include "opencl_dummys.h"
-
 #define check(expected, actual) \
 	if (expected != actual) { \
 		fprintf(stderr, "%s != %s in %s:%i!\n", #expected, #actual, __FILE__, __LINE__); \

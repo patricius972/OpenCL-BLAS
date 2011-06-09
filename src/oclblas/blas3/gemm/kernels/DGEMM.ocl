@@ -1,0 +1,67 @@
+#define __kernel
+#define __local
+#define __global
+
+__kernel void sgemm(const int colMajor, const int transa, const int transb,
+		const unsigned int m, const unsigned int n, const unsigned int k,
+		const double alpha, __global double* a, const int lda,
+		__global double* b, const int ldb, const double beta,
+		__global double* c, const int ldc)
+{
+	__local double bufferA[SUBMATRIX_SIZE * SUBMATRIX_SIZE];
+	__local
+	double bufferB[SUBMATRIX_SIZE * SUBMATRIX_SIZE];
+
+	const int row = get_global_id(0);
+	const int col = get_global_id(1);
+
+	const int localRow = get_local_id(0);
+	const int localCol = get_local_id(1);
+
+	const int transc = 0;
+	FloatMatrix A =
+	{ m, k, colMajor, transa, lda, a };
+	FloatMatrix B =
+	{ k, n, colMajor, transb, ldb, b };
+	FloatMatrix C =
+	{ m, n, colMajor, transc, ldc, c };
+
+	double r = 0.0;
+	for (int i = 0; i < k; i += SUBMATRIX_SIZE)
+	{
+		bufferA[localCol * SUBMATRIX_SIZE + localRow] = getMatrixFloat(A, row,
+				i + localCol);
+		bufferB[localCol * SUBMATRIX_SIZE + localRow] = getMatrixFloat(B, i
+				+ localRow, col);
+
+		/*
+		 * Synchronize to make sure the sub-matrices are loaded
+		 * before starting the computation
+		 */
+		barrier(CLK_LOCAL_MEM_FENCE);
+
+#pragma unroll
+		for (int j = 0; j < SUBMATRIX_SIZE; ++j)
+		{
+			r += bufferA[j * SUBMATRIX_SIZE + localRow] * bufferB[localCol
+					* SUBMATRIX_SIZE + j];
+		}
+
+		/*
+		 * Synchronize to make sure that the preceding
+		 * computation is done before loading two new
+		 * sub-matrices of A and B in the next iteration
+		 */
+		barrier(CLK_LOCAL_MEM_FENCE);
+	}
+
+	if (beta == 0.0)
+	{
+		setMatrixFloat(C, row, col, alpha * r);
+	}
+	else
+	{
+		setMatrixFloat(C, row, col, alpha * r + beta * getMatrixFloat(C, row,
+				col));
+	}
+}

@@ -96,6 +96,23 @@ void testRowMajorUntransposed()
 	check(0, getMatrixFloat(matrix, 3, 1));
 	check(0, getMatrixFloat(matrix, 4, 1));
 	check(0, getMatrixFloat(matrix, 0, 2));
+
+	float testData2[6];
+	testData2[0] = 1;
+	testData2[1] = 2;
+	testData2[2] = 3;
+	testData2[3] = 4;
+	testData2[4] = 5;
+	testData2[5] = 6;
+	FloatMatrix matrix2 =
+	{ 3, 2, 0, 0, 2, testData2 };
+
+	check(1, getMatrixFloat(matrix2, 0, 0));
+	check(2, getMatrixFloat(matrix2, 0, 1));
+	check(3, getMatrixFloat(matrix2, 1, 0));
+	check(4, getMatrixFloat(matrix2, 1, 1));
+	check(5, getMatrixFloat(matrix2, 2, 0));
+	check(6, getMatrixFloat(matrix2, 2, 1));
 }
 
 void testRowMajorTransposed()

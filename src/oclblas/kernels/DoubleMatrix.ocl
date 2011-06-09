@@ -1,3 +1,5 @@
+#define __global
+
 typedef struct {
     unsigned int m;
     unsigned int n;

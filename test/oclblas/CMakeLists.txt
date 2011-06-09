@@ -8,4 +8,5 @@ link_libraries(
 	oclblas
 )
 
+add_subdirectory(kernels)
 add_subdirectory(blas3)
