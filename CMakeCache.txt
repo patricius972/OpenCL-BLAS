@@ -150,6 +150,9 @@ oclblas_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;general;opencl;general;oclb
 oclgemm_LIB_DEPENDS:STATIC=general;OpenCL;general;rt;general;opencl;general;oclblas1;general;oclblas2;general;oclblas3;
 
 //Dependencies for the target
+ocltest_LIB_DEPENDS:STATIC=general;pthread;
+
+//Dependencies for the target
 opencl_LIB_DEPENDS:STATIC=general;OpenCL;
 
 //Dependencies for target
@@ -250,7 +253,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=25
+CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=28
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

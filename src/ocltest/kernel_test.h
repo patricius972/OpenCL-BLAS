@@ -8,8 +8,12 @@
 #ifndef KERNEL_TEST_H_
 #define KERNEL_TEST_H_
 
-#define SUCCESS 0
-#define INVALID_PROBLEM_DIMENSION 1
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "ocltest_constants.h"
+#include "kernel_functions.h"
+
 
 /**
  * This function runs a OpenCL kernel code for testing purpose. The kernel is
@@ -18,23 +22,36 @@
  * afterwards. This is used to not to implemented a parser for OpenCL C
  * parsing.
  */
-int testKernel(void *kernel(), size_t numSizes, size_t *globalSize,
-		size_t *localSize);
+int ocltest_testKernel(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes);
 
 /**
  * This function is the same like testKernel(), but needs to get all sizes in
  * all three dimensions. This function calls _runKernel() every work group.
  */
-int _testKernel(void *kernel(), size_t globalSize1, size_t globalSize2,
-		size_t globalSize3, size_t localSize1, size_t localSize2,
-		size_t localSize3);
+int _testKernel(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds, unsigned int currentDimension);
 
-int _runKernel(void *kernel(), int globalPos1, int globalPos2, int globalPos3,
-		size_t globalSize1, size_t globalSize2, size_t globalSize3,
-		size_t localSize1, size_t localSize2, size_t localSize3);
+int _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds);
 
-int _startKernelThread(void *kernel(), int globalId, int localId) {
+int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds, unsigned int *localIds,
+		unsigned int currentDimension);
 
-}
+int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds, unsigned int *localIds);
+
+typedef struct {
+	unsigned int threadId;
+	void (*kernel)();
+	unsigned int *localIds;
+} startParamsStruct;
+
+void *start(void *startParams);
 
 #endif /* KERNEL_TEST_H_ */

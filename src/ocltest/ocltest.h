@@ -11,10 +11,10 @@
 #include "kernel_functions.h"
 #include "kernel_test.h"
 
-unsigned int initialized;
+int initialized;
 
 void ocltest_init();
 void ocltest_drop();
-void ocltest_isInitialized();
+int ocltest_isInitialized();
 
 #endif /* OCLTEST_H_ */

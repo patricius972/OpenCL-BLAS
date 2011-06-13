@@ -1,3 +1,5 @@
+add_subdirectory(kernels)
+
 set(sgemm_target oclblas_sgemm_test)
 file(GLOB sgemm_sources ${CMAKE_CURRENT_SOURCE_DIR}/sgemm*.c)
 add_executable(${sgemm_target} ${sgemm_sources})

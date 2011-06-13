@@ -7,28 +7,29 @@ open HEADER, ">oclStdKernels.h";
 print HEADER "#ifndef OCL_KERNELS_H\n";
 print HEADER "#define OCL_KERNELS_H\n";
 
-foreach $file (`find -type f -name '*.ocl'`)
-{
+foreach $file (`find -type f -name '*.ocl'`) {
 	chomp $file;
 	$name = $file;
 	$name =~ s/^.*\/([^\/]*)\.ocl$/ocl$1/;
 
 	print HEADER "\n";
-	print HEADER "/*****************************************************************************\n";
+	print HEADER
+"/*****************************************************************************\n";
 	print HEADER " * Auto-generated string constant from OpenCL source file\n";
 	print HEADER " * '$file'.\n";
-	print HEADER " * This constant is used to put the OpenCL source within the binary and to\n";
+	print HEADER
+" * This constant is used to put the OpenCL source within the binary and to\n";
 	print HEADER " * hand it to the OpenCL compiler of the present devices.\n";
-	print HEADER " ****************************************************************************/\n";
-	print HEADER "const char *".$name.";\n";
+	print HEADER
+" ****************************************************************************/\n";
+	print HEADER "const char *" . $name . ";\n";
 
 	print SOURCE "\n";
-	print SOURCE "const char *".$name." =";
-	foreach (`cat $file`) 
+	print SOURCE "const char *" . $name . " =";
+	foreach (`cat $file`)
 	{
 		chomp;
-		if (m/^#/) 
-		{
+		if (m/^#/) {
 			next;
 		}
 		s/\"/\\"/;

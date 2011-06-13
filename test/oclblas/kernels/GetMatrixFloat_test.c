@@ -1,5 +1,7 @@
 #include <oclblas/oclblas.h>
 
+#include <ocltest/ocltest.h>
+
 #include <testutils/oclkerneltest.h>
 
 #include <oclblas/kernels/FloatMatrix.ocl>

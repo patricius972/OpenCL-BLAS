@@ -7,83 +7,172 @@
 
 #include "kernel_test.h"
 
-int testKernel(void *kernel(), size_t numSizes, size_t *globalSize,
-		size_t *localSize)
+int ocltest_testKernel(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes)
 {
-	if (numSizes == 1)
+	if (numDimensions > 3)
 	{
-		return testKernel(kernel, globalSize[0], 1, 1, localSize[0], 1, 1);
+		return INVALID_PROBLEM_DIMENSION;
 	}
-	else if (numSizes == 2)
+	for (unsigned int dim = 0; dim < numDimensions; ++dim)
 	{
-		return testKernel(kernel, globalSize[0], globalSize[1], 1,
-				localSize[0], localSize[1], 1);
-	}
-	else if (numSizes == 3)
-	{
-		return testKernel(kernel, globalSize[0], globalSize[1], globalSize[2],
-				localSize[0], localSize[1], localSize[2]);
-	}
-	return INVALID_PROBLEM_DIMENSION;
-}
-
-int _testKernel(void *kernel(), size_t globalSize1, size_t globalSize2,
-		size_t globalSize3, size_t localSize1, size_t localSize2,
-		size_t localSize3)
-{
-	int globalSteps1 = globalSize1 % localSize1 == 0 ? globalSize1 / localSize1
-			: globalSize1 / localSize1 + 1;
-	int globalSteps2 = globalSize2 % localSize2 == 0 ? globalSize2 / localSize2
-			: globalSize2 / localSize2 + 1;
-	int globalSteps3 = globalSize3 % localSize3 == 0 ? globalSize3 / localSize3
-			: globalSize3 / localSize3 + 1;
-	for (int globalPos1 = 0; globalPos1 < globalSteps1; ++globalPos1)
-	{
-		for (int globalPos2 = 0; globalPos2 < globalSteps2; ++globalPos2)
+		if (globalSizes[dim] % localSizes[dim] != 0)
 		{
-			for (int globalPos3 = 0; globalPos3 < globalSteps3; ++globalPos3)
-			{
-				int result = _runKernel(kernel, globalPos1, globalPos2,
-						globalPos3, globalSize1, globalSize2, globalSize3,
-						localSize1, localSize2, localSize3);
-				if (result != SUCCESS)
-				{
-					return result;
-				}
-			}
+			return INVALID_LOCAL_SIZE;
 		}
 	}
+	initKernelTest(numDimensions, globalSizes, localSizes);
+	unsigned int *globalIds = malloc(sizeof(unsigned int) * numDimensions);
+	int result = _testKernel(kernel, numDimensions, globalSizes, localSizes,
+			globalIds, 0);
+	dropKernelTest();
+	free(globalIds);
+	return result;
+}
+
+int _testKernel(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds, unsigned int currentDimension)
+{
+	if (currentDimension < numDimensions)
+	{
+		int stepNum = globalSizes[currentDimension]
+				/ localSizes[currentDimension];
+		for (globalIds[currentDimension] = 0; globalIds[currentDimension]
+				< stepNum; ++globalIds[currentDimension])
+		{
+			int result = _testKernel(kernel, numDimensions, globalSizes,
+					localSizes, globalIds, currentDimension + 1);
+			if (result != SUCCESS)
+			{
+				return result;
+			}
+		}
+		return SUCCESS;
+	}
+	else
+	{
+		return _runWorkGroup(kernel, numDimensions, globalSizes, localSizes,
+				globalIds);
+	}
+}
+
+int _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds)
+{
+	printf("Starting workgroup!\n");
+	initWorkGroup(numDimensions, globalIds);
+	unsigned int *localIds = malloc(sizeof(unsigned int) * numDimensions);
+	int result = _runWorkGroupThreads(kernel, numDimensions, globalSizes,
+			localSizes, globalIds, localIds, 0);
+	printf("Destroying workgroup!\n");
+	dropWorkGroup();
+	printf("Workgroup destroyed!\n");
+	free(localIds);
+	return result;
+
+}
+
+int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds, unsigned int *localIds,
+		unsigned int currentDimension)
+{
+	if (currentDimension < numDimensions)
+	{
+		for (localIds[currentDimension] = 0; localIds[currentDimension]
+				< localSizes[currentDimension]; ++localIds[currentDimension])
+		{
+			int result = _runWorkGroupThreads(kernel, numDimensions,
+					globalSizes, localSizes, globalIds, localIds,
+					currentDimension + 1);
+			if (result != SUCCESS)
+			{
+				return result;
+			}
+		}
+		return SUCCESS;
+	}
+	else
+	{
+		return _runKernelThread(kernel, numDimensions, globalSizes, localSizes,
+				globalIds, localIds);
+	}
+}
+
+void *start(void *startParams)
+{
+	startParamsStruct *params = (startParamsStruct*) startParams;
+
+	if (pthread_setspecific(_localIds, params->localIds) != 0)
+	{
+		free(params->localIds);
+		free(params);
+		fprintf(stderr, "Could not set specific!");
+		int *i = malloc(sizeof(int));
+		pthread_exit(i);
+	}
+
+	params->kernel();
+
+	/* free all resources... */
+	free(params->localIds);
+	free(params);
+	pthread_exit(NULL);
+}
+
+int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes,
+		unsigned int *globalIds, unsigned int *localIds)
+{
+	unsigned int threadId = 0;
+	for (unsigned int dim = 0; dim < numDimensions; ++dim)
+	{
+		unsigned int dimId = localIds[dim];
+		for (unsigned int dim2 = dim + 1; dim2 < numDimensions; ++dim2)
+		{
+			dimId *= localSizes[dim2];
+		}
+		threadId += dimId;
+	}
+
+	printf("start kernel thread %2i: ", threadId);
+	for (unsigned int dim = 0; dim < numDimensions; ++dim)
+	{
+		if (dim > 0)
+		{
+			printf(",");
+		}
+		printf("%i", globalIds[dim]);
+	}
+	printf(" / ");
+	for (unsigned int dim = 0; dim < numDimensions; ++dim)
+	{
+		if (dim > 0)
+		{
+			printf(",");
+		}
+		printf("%i", localIds[dim]);
+	}
+	printf("\n");
+
+	startParamsStruct *params = malloc(sizeof(startParamsStruct));
+	params->kernel = kernel;
+	params->localIds = malloc(sizeof(unsigned int) * numDimensions);
+	for (unsigned int dim = 0; dim < numDimensions; ++dim)
+	{
+		params->localIds[dim] = localIds[dim];
+	}
+	params->threadId = threadId;
+	if (pthread_create(&_kernelThreads[threadId], NULL, start, params) != 0)
+	{
+		return THREADING_FAILURE;
+	}
+	if (_kernelThreads[threadId] == 0)
+	{
+		fprintf(stderr, "ERROR!!!\n");
+	}
+
 	return SUCCESS;
-}
-
-int _runKernel(void *kernel(), int globalPos1, int globalPos2, int globalPos3,
-		size_t globalSize1, size_t globalSize2, size_t globalSize3,
-		size_t localSize1, size_t localSize2, size_t localSize3)
-{
-	for (int localPos1 = 0; localPos1 < localSize1; ++localPos1)
-	{
-		if (globalPos1 * localSize1 + localPos1 >= globalSize1)
-		{
-			continue;
-		}
-		for (int localPos2 = 0; localPos2 < localSize; ++localPos2)
-		{
-			if (globalPos2 * localSize2 + localPos2 >= globalSize2)
-			{
-				continue;
-			}
-			for (int localPos3 = 0; localPos3 < localSize; ++localPos3)
-			{
-				if (globalPos3 * localSize3 + localPos3 >= globalSize3)
-				{
-					continue;
-				}
-				int _startKernelThread(kernel, globalPos1, globalPos2, globalPos3, localPos1, localPos2, localPos3) {
-
-				}
-
-				// TODO create thread and run it
-			}
-		}
-	}
 }

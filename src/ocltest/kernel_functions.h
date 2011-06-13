@@ -15,11 +15,32 @@
 #ifndef KERNEL_FUNCTIONS_H_
 #define KERNEL_FUNCTIONS_H_
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <pthread.h>
 
-int get_global_id(unsigned int dim);
+#include "ocltest_constants.h"
 
+unsigned int _numDimensions;
+unsigned int *_globalSizes;
+unsigned int *_localSizes;
+unsigned int _workGroupThreadNum;
+pthread_t *_kernelThreads;
+
+int initKernelTest(unsigned int numDimensions, unsigned int *globalSizes,
+		unsigned int *localSizes);
+int dropKernelTest();
+
+unsigned int *_globalIds;
+pthread_key_t _localIds;
+
+int initWorkGroup(unsigned int numDimensions, unsigned int *globalIds);
+int dropWorkGroup();
+
+int get_global_id(unsigned int dim);
 int get_local_id(unsigned int dim);
+int get_global_size(unsigned int dim);
+int get_local_size(unsigned int dim);
 
 #define CLK_LOCAL_MEM_FENCE 0
 

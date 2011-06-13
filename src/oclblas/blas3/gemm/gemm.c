@@ -61,41 +61,47 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	/* Create Memory Buffer */
 	if (order == ColumnMajor)
 	{
-		memA = clCreateBuffer(usedContext, CL_MEM_READ_ONLY
-				| CL_MEM_COPY_HOST_PTR, lda * k * sizeof(float), a, &ret);
+		memA = clCreateBuffer(usedContext,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				lda * k * sizeof(float), a, &ret);
 		ERROR_HANDLER(ret);
-		memB = clCreateBuffer(usedContext, CL_MEM_READ_ONLY
-				| CL_MEM_COPY_HOST_PTR, ldb * n * sizeof(float), b, &ret);
+		memB = clCreateBuffer(usedContext,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				ldb * n * sizeof(float), b, &ret);
 		ERROR_HANDLER(ret);
 		if (beta != 0.0)
 		{
-			memC = clCreateBuffer(usedContext, CL_MEM_READ_WRITE
-					| CL_MEM_COPY_HOST_PTR, ldc * n * sizeof(float), c, &ret);
+			memC = clCreateBuffer(usedContext,
+					CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+					ldc * n * sizeof(float), c, &ret);
 		}
 		else
 		{
-			memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY, ldc * n
-					* sizeof(float), NULL, &ret);
+			memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY,
+					ldc * n * sizeof(float), NULL, &ret);
 		}
 		ERROR_HANDLER(ret);
 	}
 	else
 	{
-		memA = clCreateBuffer(usedContext, CL_MEM_READ_ONLY
-				| CL_MEM_COPY_HOST_PTR, lda * m * sizeof(float), a, &ret);
+		memA = clCreateBuffer(usedContext,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				lda * m * sizeof(float), a, &ret);
 		ERROR_HANDLER(ret);
-		memB = clCreateBuffer(usedContext, CL_MEM_READ_ONLY
-				| CL_MEM_COPY_HOST_PTR, ldb * k * sizeof(float), b, &ret);
+		memB = clCreateBuffer(usedContext,
+				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+				ldb * k * sizeof(float), b, &ret);
 		ERROR_HANDLER(ret);
 		if (beta != 0.0)
 		{
-			memC = clCreateBuffer(usedContext, CL_MEM_READ_WRITE
-					| CL_MEM_COPY_HOST_PTR, ldc * m * sizeof(float), c, &ret);
+			memC = clCreateBuffer(usedContext,
+					CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+					ldc * m * sizeof(float), c, &ret);
 		}
 		else
 		{
-			memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY, ldc * m
-					* sizeof(float), NULL, &ret);
+			memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY,
+					ldc * m * sizeof(float), NULL, &ret);
 		}
 		ERROR_HANDLER(ret);
 	}
@@ -104,6 +110,7 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	int colMajor = order == ColumnMajor ? 1 : 0;
 	int transa = transposeA == NO ? 0 : 1;
 	int transb = transposeB == NO ? 0 : 1;
+	unsigned int submatrixSize = SUBMATRIX_SIZE;
 	ERROR_HANDLER(clSetKernelArg(kernel, 0, sizeof(int), (void *) &colMajor));
 	ERROR_HANDLER(clSetKernelArg(kernel, 1, sizeof(int), (void *) &transa));
 	ERROR_HANDLER(clSetKernelArg(kernel, 2, sizeof(int), (void *) &transb));
@@ -118,6 +125,9 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	ERROR_HANDLER(clSetKernelArg(kernel, 11, sizeof(float), (void *) &beta));
 	ERROR_HANDLER(clSetKernelArg(kernel, 12, sizeof(cl_mem), (void *) &memC));
 	ERROR_HANDLER(clSetKernelArg(kernel, 13, sizeof(int), (void *) &ldc));
+	ERROR_HANDLER(clSetKernelArg(kernel, 14, sizeof(unsigned int), &submatrixSize));
+	ERROR_HANDLER(clSetKernelArg(kernel, 15, sizeof(cl_float) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
+	ERROR_HANDLER(clSetKernelArg(kernel, 16, sizeof(cl_float) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
 
 	/* Execute OpenCL Kernel */
 	size_t global_item_size[2];
@@ -140,13 +150,13 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	/* Copy results from the memory buffer */
 	if (order == ColumnMajor)
 	{
-		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0, ldc * n
-				* sizeof(float), c, 0, NULL, NULL);
+		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0,
+				ldc * n * sizeof(float), c, 0, NULL, NULL);
 	}
 	else
 	{
-		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0, ldc * m
-				* sizeof(float), c, 0, NULL, NULL);
+		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0,
+				ldc * m * sizeof(float), c, 0, NULL, NULL);
 	}
 	ERROR_HANDLER(ret);
 	printMatrixS(order, m, n, c, ldc);
@@ -244,13 +254,14 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	ERROR_HANDLER(ret);
 	if (beta != 0.0)
 	{
-		memC = clCreateBuffer(usedContext, CL_MEM_READ_WRITE
-				| CL_MEM_COPY_HOST_PTR, ldc * n * sizeof(float), c, &ret);
+		memC = clCreateBuffer(usedContext,
+				CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+				ldc * n * sizeof(float), c, &ret);
 	}
 	else
 	{
-		memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY, ldc * n
-				* sizeof(float), NULL, &ret);
+		memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY,
+				ldc * n * sizeof(float), NULL, &ret);
 	}
 	ERROR_HANDLER(ret);
 
@@ -294,13 +305,13 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	/* Copy results from the memory buffer */
 	if (order == ColumnMajor)
 	{
-		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0, ldc * n
-				* sizeof(float), c, 0, NULL, NULL);
+		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0,
+				ldc * n * sizeof(float), c, 0, NULL, NULL);
 	}
 	else
 	{
-		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0, ldc * n
-				* sizeof(float), c, 0, NULL, NULL);
+		ret = clEnqueueReadBuffer(usedCommandQueue, memC, CL_TRUE, 0,
+				ldc * n * sizeof(float), c, 0, NULL, NULL);
 	}
 	ERROR_HANDLER(ret);
 

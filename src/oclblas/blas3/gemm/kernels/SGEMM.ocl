@@ -5,12 +5,9 @@
 __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		const unsigned int m, const unsigned int n, const unsigned int k,
 		const float alpha, __global float* a, const int lda, __global float* b,
-		const int ldb, const float beta, __global float* c, const int ldc)
+		const int ldb, const float beta, __global float* c, const int ldc,
+		unsigned int submatrixSize, float* bufferA, float* bufferB)
 {
-	__local float bufferA[SUBMATRIX_SIZE * SUBMATRIX_SIZE];
-	__local
-	float bufferB[SUBMATRIX_SIZE * SUBMATRIX_SIZE];
-
 	const int row = get_global_id(0);
 	const int col = get_global_id(1);
 
@@ -26,12 +23,12 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 	{ m, n, colMajor, transc, ldc, c };
 
 	float r = 0.0;
-	for (int i = 0; i < k; i += SUBMATRIX_SIZE)
+	for (int i = 0; i < k; i += submatrixSize)
 	{
-		bufferA[localCol * SUBMATRIX_SIZE + localRow] = getMatrixFloat(A, row,
+		bufferA[localCol * submatrixSize + localRow] = getMatrixFloat(A, row,
 				i + localCol);
-		bufferB[localCol * SUBMATRIX_SIZE + localRow] = getMatrixFloat(B, i
-				+ localRow, col);
+		bufferB[localCol * submatrixSize + localRow] = getMatrixFloat(B,
+				i + localRow, col);
 
 		/*
 		 * Synchronize to make sure the sub-matrices are loaded
@@ -39,11 +36,11 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		 */
 		barrier(CLK_LOCAL_MEM_FENCE);
 
-#pragma unroll
-		for (int j = 0; j < SUBMATRIX_SIZE; ++j)
+		/* #pragma unroll */
+		for (int j = 0; j < submatrixSize; ++j)
 		{
-			r += bufferA[j * SUBMATRIX_SIZE + localRow] * bufferB[localCol
-					* SUBMATRIX_SIZE + j];
+			r += bufferA[j * submatrixSize + localRow] * bufferB[localCol
+					* submatrixSize + j];
 		}
 
 		/*
@@ -60,7 +57,7 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 	}
 	else
 	{
-		setMatrixFloat(C, row, col, alpha * r + beta * getMatrixFloat(C, row,
-				col));
+		setMatrixFloat(C, row, col,
+				alpha * r + beta * getMatrixFloat(C, row, col));
 	}
 }
