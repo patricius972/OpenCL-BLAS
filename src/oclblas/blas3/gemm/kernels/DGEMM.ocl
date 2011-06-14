@@ -1,7 +1,3 @@
-#define __kernel
-#define __local
-#define __global
-
 __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		const unsigned int m, const unsigned int n, const unsigned int k,
 		const double alpha, __global double* a, const int lda,
@@ -20,11 +16,11 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 
 	const int transc = 0;
 	FloatMatrix A =
-	{ m, k, colMajor, transa, lda, a };
+	{	m, k, colMajor, transa, lda, a};
 	FloatMatrix B =
-	{ k, n, colMajor, transb, ldb, b };
+	{	k, n, colMajor, transb, ldb, b};
 	FloatMatrix C =
-	{ m, n, colMajor, transc, ldc, c };
+	{	m, n, colMajor, transc, ldc, c};
 
 	double r = 0.0;
 	for (int i = 0; i < k; i += SUBMATRIX_SIZE)
@@ -44,7 +40,7 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		for (int j = 0; j < SUBMATRIX_SIZE; ++j)
 		{
 			r += bufferA[j * SUBMATRIX_SIZE + localRow] * bufferB[localCol
-					* SUBMATRIX_SIZE + j];
+			* SUBMATRIX_SIZE + j];
 		}
 
 		/*
@@ -62,6 +58,6 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 	else
 	{
 		setMatrixFloat(C, row, col, alpha * r + beta * getMatrixFloat(C, row,
-				col));
+						col));
 	}
 }

@@ -94,7 +94,7 @@ int main(int args, char **argv)
 	{ SUBMATRIX_SIZE, SUBMATRIX_SIZE };
 	unsigned int localSizes[] =
 	{ SUBMATRIX_SIZE, SUBMATRIX_SIZE };
-	ocltest_testKernel(kernelCall, 2, globalSizes, localSizes);
+	ocltest_runKernel(kernelCall, 2, globalSizes, localSizes);
 
 	printMatrixS(colMajor, m, n, c, 3);
 

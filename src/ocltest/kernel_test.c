@@ -7,7 +7,7 @@
 
 #include "kernel_test.h"
 
-int ocltest_testKernel(void(*kernel)(), unsigned int numDimensions,
+int ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes)
 {
 	if (numDimensions > 3)
@@ -23,14 +23,14 @@ int ocltest_testKernel(void(*kernel)(), unsigned int numDimensions,
 	}
 	initKernelTest(numDimensions, globalSizes, localSizes);
 	unsigned int *globalIds = malloc(sizeof(unsigned int) * numDimensions);
-	int result = _testKernel(kernel, numDimensions, globalSizes, localSizes,
+	int result = _runKernel(kernel, numDimensions, globalSizes, localSizes,
 			globalIds, 0);
 	dropKernelTest();
 	free(globalIds);
 	return result;
 }
 
-int _testKernel(void(*kernel)(), unsigned int numDimensions,
+int _runKernel(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds, unsigned int currentDimension)
 {
@@ -41,7 +41,7 @@ int _testKernel(void(*kernel)(), unsigned int numDimensions,
 		for (globalIds[currentDimension] = 0; globalIds[currentDimension]
 				< stepNum; ++globalIds[currentDimension])
 		{
-			int result = _testKernel(kernel, numDimensions, globalSizes,
+			int result = _runKernel(kernel, numDimensions, globalSizes,
 					localSizes, globalIds, currentDimension + 1);
 			if (result != SUCCESS)
 			{
@@ -101,41 +101,12 @@ int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
 	}
 }
 
-void *start(void *startParams)
-{
-	startParamsStruct *params = (startParamsStruct*) startParams;
-
-	if (pthread_setspecific(_localIds, params->localIds) != 0)
-	{
-		free(params->localIds);
-		free(params);
-		fprintf(stderr, "Could not set specific!");
-		int *i = malloc(sizeof(int));
-		pthread_exit(i);
-	}
-
-	params->kernel();
-
-	/* free all resources... */
-	free(params->localIds);
-	free(params);
-	pthread_exit(NULL);
-}
-
 int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds, unsigned int *localIds)
 {
-	unsigned int threadId = 0;
-	for (unsigned int dim = 0; dim < numDimensions; ++dim)
-	{
-		unsigned int dimId = localIds[dim];
-		for (unsigned int dim2 = dim + 1; dim2 < numDimensions; ++dim2)
-		{
-			dimId *= localSizes[dim2];
-		}
-		threadId += dimId;
-	}
+	unsigned int threadId = _getWorkGroupThreadId(numDimensions, localSizes,
+			localIds);
 
 	printf("start kernel thread %2i: ", threadId);
 	for (unsigned int dim = 0; dim < numDimensions; ++dim)
@@ -165,7 +136,8 @@ int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
 		params->localIds[dim] = localIds[dim];
 	}
 	params->threadId = threadId;
-	if (pthread_create(&_kernelThreads[threadId], NULL, start, params) != 0)
+	if (pthread_create(&_kernelThreads[threadId], NULL, pthreadCreateCallback,
+			params) != 0)
 	{
 		return THREADING_FAILURE;
 	}
@@ -175,4 +147,41 @@ int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
 	}
 
 	return SUCCESS;
+}
+
+void *pthreadCreateCallback(void *startParams)
+{
+	startParamsStruct *params = (startParamsStruct*) startParams;
+
+	if (pthread_setspecific(_localIds, params->localIds) != 0)
+	{
+		free(params->localIds);
+		free(params);
+		fprintf(stderr, "Could not set specific!");
+		int *i = malloc(sizeof(int));
+		pthread_exit(i);
+	}
+
+	params->kernel();
+
+	/* free all resources... */
+	free(params->localIds);
+	free(params);
+	pthread_exit(NULL);
+}
+
+unsigned int _getWorkGroupThreadId(unsigned int numDimensions,
+		unsigned int *localSizes, unsigned int *localIds)
+{
+	unsigned int threadId = 0;
+	for (unsigned int dim = 0; dim < numDimensions; ++dim)
+	{
+		unsigned int dimId = localIds[dim];
+		for (unsigned int dim2 = dim + 1; dim2 < numDimensions; ++dim2)
+		{
+			dimId *= localSizes[dim2];
+		}
+		threadId += dimId;
+	}
+	return threadId;
 }

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 	{ 8, 8 };
 	unsigned int localSizes[] =
 	{ 4, 2 };
-	ocltest_testKernel(sampleKernel, numDimensions, globalSizes, localSizes);
+	ocltest_runKernel(sampleKernel, numDimensions, globalSizes, localSizes);
 	ocltest_drop();
 	if (ocltest_isInitialized())
 	{
