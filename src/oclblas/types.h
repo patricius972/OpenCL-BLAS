@@ -5,8 +5,8 @@
  *      Author: ludwig
  */
 
-#ifndef OCLBTYPES_H_
-#define OCLBTYPES_H_
+#ifndef TYPES_H_
+#define TYPES_H_
 
 typedef enum
 {

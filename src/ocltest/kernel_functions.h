@@ -27,15 +27,16 @@ unsigned int *_localSizes;
 unsigned int _workGroupThreadNum;
 pthread_t *_kernelThreads;
 
-int initKernelTest(unsigned int numDimensions, unsigned int *globalSizes,
-		unsigned int *localSizes);
-int dropKernelTest();
+OpenCLTestStatus initKernelTest(unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes);
+OpenCLTestStatus dropKernelTest();
 
 unsigned int *_globalIds;
 pthread_key_t _localIds;
 
-int initWorkGroup(unsigned int numDimensions, unsigned int *globalIds);
-int dropWorkGroup();
+OpenCLTestStatus initWorkGroup(unsigned int numDimensions,
+		unsigned int *globalIds);
+OpenCLTestStatus dropWorkGroup();
 
 int get_global_id(unsigned int dim);
 int get_local_id(unsigned int dim);

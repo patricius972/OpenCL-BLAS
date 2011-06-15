@@ -2,12 +2,10 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		const unsigned int m, const unsigned int n, const unsigned int k,
 		const double alpha, __global double* a, const int lda,
 		__global double* b, const int ldb, const double beta,
-		__global double* c, const int ldc)
+		__global double* c, const int ldc,
+		const unsigned int submatrixSize, __local double* bufferA,
+		__local double* bufferB)
 {
-	__local double bufferA[SUBMATRIX_SIZE * SUBMATRIX_SIZE];
-	__local
-	double bufferB[SUBMATRIX_SIZE * SUBMATRIX_SIZE];
-
 	const int row = get_global_id(0);
 	const int col = get_global_id(1);
 

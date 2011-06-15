@@ -14,7 +14,7 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 		const int ldc)
 {
 	cl_int ret;
-	OpenCLStatus status = FAILURE;
+	OpenCLStatus status = opencl_failure;
 
 	cl_device_id usedDevice = deviceIds[1][0];
 
@@ -61,14 +61,34 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	/* Create Memory Buffer */
 	if (order == ColumnMajor)
 	{
-		memA = clCreateBuffer(usedContext,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				lda * k * sizeof(float), a, &ret);
-		ERROR_HANDLER(ret);
-		memB = clCreateBuffer(usedContext,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				ldb * n * sizeof(float), b, &ret);
-		ERROR_HANDLER(ret);
+		if (transposeA == NO)
+		{
+			memA = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					lda * k * sizeof(float), a, &ret);
+			ERROR_HANDLER(ret);
+		}
+		else
+		{
+			memA = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					lda * m * sizeof(float), a, &ret);
+			ERROR_HANDLER(ret);
+		}
+		if (transposeB == NO)
+		{
+			memB = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					ldb * n * sizeof(float), b, &ret);
+			ERROR_HANDLER(ret);
+		}
+		else
+		{
+			memB = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					ldb * k * sizeof(float), b, &ret);
+			ERROR_HANDLER(ret);
+		}
 		if (beta != 0.0)
 		{
 			memC = clCreateBuffer(usedContext,
@@ -84,14 +104,34 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	}
 	else
 	{
-		memA = clCreateBuffer(usedContext,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				lda * m * sizeof(float), a, &ret);
-		ERROR_HANDLER(ret);
-		memB = clCreateBuffer(usedContext,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				ldb * k * sizeof(float), b, &ret);
-		ERROR_HANDLER(ret);
+		if (transposeA == NO)
+		{
+			memA = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					lda * m * sizeof(float), a, &ret);
+			ERROR_HANDLER(ret);
+		}
+		else
+		{
+			memA = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					lda * k * sizeof(float), a, &ret);
+			ERROR_HANDLER(ret);
+		}
+		if (transposeB == NO)
+		{
+			memB = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					ldb * k * sizeof(float), b, &ret);
+			ERROR_HANDLER(ret);
+		}
+		else
+		{
+			memB = clCreateBuffer(usedContext,
+					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+					ldb * n * sizeof(float), b, &ret);
+			ERROR_HANDLER(ret);
+		}
 		if (beta != 0.0)
 		{
 			memC = clCreateBuffer(usedContext,
@@ -161,7 +201,7 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	ERROR_HANDLER(ret);
 	printMatrixS(order, m, n, c, ldc);
 
-	status = SUCCESS;
+	status = opencl_success;
 
 	FINISH:
 
@@ -201,7 +241,7 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 		const int ldc)
 {
 	cl_int ret;
-	OpenCLStatus status = FAILURE;
+	OpenCLStatus status = opencl_failure;
 
 	cl_device_id usedDevice = deviceIds[1][0];
 
@@ -269,6 +309,7 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	int colMajor = order == ColumnMajor ? 1 : 0;
 	int transa = transposeA == NO ? 0 : 1;
 	int transb = transposeB == NO ? 0 : 1;
+	unsigned int submatrixSize = SUBMATRIX_SIZE;
 	ERROR_HANDLER(clSetKernelArg(kernel, 0, sizeof(int), (void *) &colMajor));
 	ERROR_HANDLER(clSetKernelArg(kernel, 1, sizeof(int), (void *) &transa));
 	ERROR_HANDLER(clSetKernelArg(kernel, 2, sizeof(int), (void *) &transb));
@@ -283,6 +324,9 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	ERROR_HANDLER(clSetKernelArg(kernel, 11, sizeof(float), (void *) &beta));
 	ERROR_HANDLER(clSetKernelArg(kernel, 12, sizeof(cl_mem), (void *) &memC));
 	ERROR_HANDLER(clSetKernelArg(kernel, 13, sizeof(int), (void *) &ldc));
+	ERROR_HANDLER(clSetKernelArg(kernel, 14, sizeof(unsigned int), &submatrixSize));
+	ERROR_HANDLER(clSetKernelArg(kernel, 15, sizeof(cl_double) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
+	ERROR_HANDLER(clSetKernelArg(kernel, 16, sizeof(cl_double) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
 
 	/* Execute OpenCL Kernel */
 	size_t global_item_size[2];
@@ -315,7 +359,7 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	}
 	ERROR_HANDLER(ret);
 
-	status = SUCCESS;
+	status = opencl_success;
 
 	FINISH:
 
@@ -354,7 +398,7 @@ OpenCLStatus opencl_cgemm(const OCLBMatrixOrder order,
 		const int lda, void *b, const int ldb, const void *beta, void *c,
 		const int ldc)
 {
-	return NOT_IMPLEMENTED;
+	return opencl_not_implemented;
 }
 
 OpenCLStatus opencl_zgemm(const OCLBMatrixOrder order,
@@ -364,8 +408,8 @@ OpenCLStatus opencl_zgemm(const OCLBMatrixOrder order,
 		const int ldc)
 {
 #if OCL_DOUBLE_SUPPORTED == 1
-	return NOT_IMPLEMENTED;
+	return opencl_not_implemented;
 #else
-	return ARCHITECTURE_MISMATCH;
+	return opencl_architecture_mismatch;
 #endif
 }

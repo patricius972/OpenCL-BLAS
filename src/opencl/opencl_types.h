@@ -3,8 +3,7 @@
 
 typedef enum
 {
-	SUCCESS, NOT_IMPLEMENTED, FAILURE, ARCHITECTURE_MISMATCH
+	opencl_success, opencl_not_implemented, opencl_failure, opencl_architecture_mismatch
 } OpenCLStatus;
-
 
 #endif

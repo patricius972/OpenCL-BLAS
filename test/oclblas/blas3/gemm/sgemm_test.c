@@ -4,7 +4,7 @@
 
 int main(int args, char **argv)
 {
-	if (opencl_initPlatform() != SUCCESS)
+	if (opencl_initPlatform() != opencl_success)
 	{
 		printf("Could not initialize platform!");
 		return 1;

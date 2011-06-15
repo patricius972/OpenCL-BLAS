@@ -7,8 +7,8 @@
 
 #include "kernel_functions.h"
 
-int initKernelTest(unsigned int numDimensions, unsigned int *globalSizes,
-		unsigned int *localSizes)
+OpenCLTestStatus initKernelTest(unsigned int numDimensions,
+		unsigned int *globalSizes, unsigned int *localSizes)
 {
 	_numDimensions = numDimensions;
 	_globalSizes = globalSizes;
@@ -21,37 +21,38 @@ int initKernelTest(unsigned int numDimensions, unsigned int *globalSizes,
 	_kernelThreads = calloc(_workGroupThreadNum, sizeof(pthread_t));
 	if (pthread_barrier_init(&local_mem_fence, NULL, _workGroupThreadNum) != 0)
 	{
-		return THREADING_FAILURE;
+		return ocltest_threading_failure;
 	}
-	return SUCCESS;
+	return ocltest_success;
 }
 
-int dropKernelTest()
+OpenCLTestStatus dropKernelTest()
 {
 	free(_kernelThreads);
 	if (pthread_barrier_destroy(&local_mem_fence) != 0)
 	{
-		return THREADING_FAILURE;
+		return ocltest_threading_failure;
 	}
-	return SUCCESS;
+	return ocltest_success;
 }
 
-int initWorkGroup(unsigned int numDimensions, unsigned int *globalIds)
+OpenCLTestStatus initWorkGroup(unsigned int numDimensions,
+		unsigned int *globalIds)
 {
 	if (numDimensions != _numDimensions)
 	{
-		return INVALID_NUMBER_OF_DIMENSIONS;
+		return ocltest_invalid_number_of_dimensions;
 	}
 	_globalIds = globalIds;
 	if (pthread_key_create(&_localIds, NULL) != 0)
 	{
 		fprintf(stderr, "Could not create key!");
-		return THREADING_FAILURE;
+		return ocltest_threading_failure;
 	}
-	return SUCCESS;
+	return ocltest_success;
 }
 
-int dropWorkGroup()
+OpenCLTestStatus dropWorkGroup()
 {
 	void *status = NULL;
 	for (unsigned int threadId = 0; threadId < _workGroupThreadNum; ++threadId)
@@ -60,22 +61,22 @@ int dropWorkGroup()
 		{
 			if (pthread_join(_kernelThreads[threadId], &status) != 0)
 			{
-				return THREADING_FAILURE;
+				return ocltest_threading_failure;
 			}
 			_kernelThreads[threadId] = 0;
 			if (status != NULL)
 			{
 				free(status);
-				return FAILURE_IN_KERNEL_RUN;
+				return ocltest_failure_in_kernel_run;
 			}
 		}
 	}
 	if (pthread_key_delete(_localIds) != 0)
 	{
 		fprintf(stderr, "Could not delete key!");
-		return THREADING_FAILURE;
+		return ocltest_threading_failure;
 	}
-	return SUCCESS;
+	return ocltest_success;
 }
 
 int get_global_id(unsigned int dim)

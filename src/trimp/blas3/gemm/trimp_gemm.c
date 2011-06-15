@@ -7,11 +7,10 @@
 
 #include "trimp_gemm.h"
 
-OpenCLStatus trimp_sgemm(const OCLBMatrixOrder order,
-		OCLBTranspose transposeA, OCLBTranspose transposeB, const int m,
-		const int n, const int k, const float alpha, const float *a,
-		const int lda, const float *b, const int ldb, const float beta,
-		float *c, const int ldc)
+OpenCLStatus trimp_sgemm(const OCLBMatrixOrder order, OCLBTranspose transposeA,
+		OCLBTranspose transposeB, const int m, const int n, const int k,
+		const float alpha, const float *a, const int lda, const float *b,
+		const int ldb, const float beta, float *c, const int ldc)
 {
 	if (order == RowMajor)
 	{
@@ -41,14 +40,13 @@ OpenCLStatus trimp_sgemm(const OCLBMatrixOrder order,
 			}
 		}
 	}
-	return SUCCESS;
+	return opencl_success;
 }
 
-OpenCLStatus trimp_dgemm(const OCLBMatrixOrder order,
-		OCLBTranspose transposeA, OCLBTranspose transposeB, const int m,
-		const int n, const int k, const double alpha, const double *a,
-		const int lda, const double *b, const int ldb, const double beta,
-		double *c, const int ldc)
+OpenCLStatus trimp_dgemm(const OCLBMatrixOrder order, OCLBTranspose transposeA,
+		OCLBTranspose transposeB, const int m, const int n, const int k,
+		const double alpha, const double *a, const int lda, const double *b,
+		const int ldb, const double beta, double *c, const int ldc)
 {
 	if (order == RowMajor)
 	{
@@ -78,7 +76,7 @@ OpenCLStatus trimp_dgemm(const OCLBMatrixOrder order,
 			}
 		}
 	}
-	return SUCCESS;
+	return opencl_success;
 }
 
 OpenCLStatus trimp_cgemm(const OCLBMatrixOrder order,
@@ -87,7 +85,7 @@ OpenCLStatus trimp_cgemm(const OCLBMatrixOrder order,
 		const void *a, const int lda, const void *b, const int ldb,
 		const void *beta, void *c, const int ldc)
 {
-	return NOT_IMPLEMENTED;
+	return opencl_not_implemented;
 }
 
 OpenCLStatus trimp_zgemm(const OCLBMatrixOrder order,
@@ -96,5 +94,5 @@ OpenCLStatus trimp_zgemm(const OCLBMatrixOrder order,
 		const void *a, const int lda, const void *b, const int ldb,
 		const void *beta, void *c, const int ldc)
 {
-	return NOT_IMPLEMENTED;
+	return opencl_not_implemented;
 }

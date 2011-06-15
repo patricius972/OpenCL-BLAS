@@ -7,18 +7,18 @@
 
 #include "kernel_test.h"
 
-int ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes)
 {
 	if (numDimensions > 3)
 	{
-		return INVALID_PROBLEM_DIMENSION;
+		return ocltest_invalid_problem_dimension;
 	}
 	for (unsigned int dim = 0; dim < numDimensions; ++dim)
 	{
 		if (globalSizes[dim] % localSizes[dim] != 0)
 		{
-			return INVALID_LOCAL_SIZE;
+			return ocltest_invalid_local_size;
 		}
 	}
 	initKernelTest(numDimensions, globalSizes, localSizes);
@@ -30,7 +30,7 @@ int ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
 	return result;
 }
 
-int _runKernel(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus _runKernel(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds, unsigned int currentDimension)
 {
@@ -43,12 +43,12 @@ int _runKernel(void(*kernel)(), unsigned int numDimensions,
 		{
 			int result = _runKernel(kernel, numDimensions, globalSizes,
 					localSizes, globalIds, currentDimension + 1);
-			if (result != SUCCESS)
+			if (result != ocltest_success)
 			{
 				return result;
 			}
 		}
-		return SUCCESS;
+		return ocltest_success;
 	}
 	else
 	{
@@ -57,27 +57,23 @@ int _runKernel(void(*kernel)(), unsigned int numDimensions,
 	}
 }
 
-int _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds)
 {
-	printf("Starting workgroup!\n");
 	initWorkGroup(numDimensions, globalIds);
 	unsigned int *localIds = malloc(sizeof(unsigned int) * numDimensions);
 	int result = _runWorkGroupThreads(kernel, numDimensions, globalSizes,
 			localSizes, globalIds, localIds, 0);
-	printf("Destroying workgroup!\n");
 	dropWorkGroup();
-	printf("Workgroup destroyed!\n");
 	free(localIds);
 	return result;
-
 }
 
-int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
-		unsigned int *globalSizes, unsigned int *localSizes,
-		unsigned int *globalIds, unsigned int *localIds,
-		unsigned int currentDimension)
+OpenCLTestStatus _runWorkGroupThreads(void(*kernel)(),
+		unsigned int numDimensions, unsigned int *globalSizes,
+		unsigned int *localSizes, unsigned int *globalIds,
+		unsigned int *localIds, unsigned int currentDimension)
 {
 	if (currentDimension < numDimensions)
 	{
@@ -87,12 +83,12 @@ int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
 			int result = _runWorkGroupThreads(kernel, numDimensions,
 					globalSizes, localSizes, globalIds, localIds,
 					currentDimension + 1);
-			if (result != SUCCESS)
+			if (result != ocltest_success)
 			{
 				return result;
 			}
 		}
-		return SUCCESS;
+		return ocltest_success;
 	}
 	else
 	{
@@ -101,32 +97,12 @@ int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
 	}
 }
 
-int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus _runKernelThread(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds, unsigned int *localIds)
 {
 	unsigned int threadId = _getWorkGroupThreadId(numDimensions, localSizes,
 			localIds);
-
-	printf("start kernel thread %2i: ", threadId);
-	for (unsigned int dim = 0; dim < numDimensions; ++dim)
-	{
-		if (dim > 0)
-		{
-			printf(",");
-		}
-		printf("%i", globalIds[dim]);
-	}
-	printf(" / ");
-	for (unsigned int dim = 0; dim < numDimensions; ++dim)
-	{
-		if (dim > 0)
-		{
-			printf(",");
-		}
-		printf("%i", localIds[dim]);
-	}
-	printf("\n");
 
 	startParamsStruct *params = malloc(sizeof(startParamsStruct));
 	params->kernel = kernel;
@@ -139,14 +115,14 @@ int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
 	if (pthread_create(&_kernelThreads[threadId], NULL, pthreadCreateCallback,
 			params) != 0)
 	{
-		return THREADING_FAILURE;
+		return ocltest_threading_failure;
 	}
 	if (_kernelThreads[threadId] == 0)
 	{
 		fprintf(stderr, "ERROR!!!\n");
 	}
 
-	return SUCCESS;
+	return ocltest_success;
 }
 
 void *pthreadCreateCallback(void *startParams)

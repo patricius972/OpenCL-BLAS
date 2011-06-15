@@ -8,11 +8,14 @@
 #ifndef OCLTEST_CONSTANTS_H_
 #define OCLTEST_CONSTANTS_H_
 
-#define SUCCESS 0
-#define INVALID_PROBLEM_DIMENSION 1
-#define INVALID_LOCAL_SIZE 2
-#define INVALID_NUMBER_OF_DIMENSIONS 3
-#define THREADING_FAILURE 4
-#define FAILURE_IN_KERNEL_RUN 5
+typedef enum
+{
+	ocltest_success,
+	ocltest_invalid_problem_dimension,
+	ocltest_invalid_local_size,
+	ocltest_invalid_number_of_dimensions,
+	ocltest_threading_failure,
+	ocltest_failure_in_kernel_run
+} OpenCLTestStatus;
 
 #endif /* CONSTANTS_H_ */

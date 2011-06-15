@@ -9,7 +9,7 @@
 
 OpenCLStatus opencl_initPlatform()
 {
-	OpenCLStatus status = FAILURE;
+	OpenCLStatus status = opencl_failure;
 
 	numPlatforms = getPlatformNum();
 	platformIds = malloc(numPlatforms * sizeof(*platformIds));
@@ -17,6 +17,7 @@ OpenCLStatus opencl_initPlatform()
 	deviceIds = malloc(numPlatforms * sizeof(*deviceIds));
 
 	/* fprintf(stdout, "%i OpenCL Platforms are available\n", getPlatformNum()); */
+
 	ERROR_HANDLER(clGetPlatformIDs(numPlatforms, platformIds, NULL));
 
 	for (unsigned int platform = 0; platform < numPlatforms; ++platform)
@@ -35,7 +36,7 @@ OpenCLStatus opencl_initPlatform()
 		 }
 		 */
 	}
-	status = SUCCESS;
+	status = opencl_success;
 	FINISH: return status;
 }
 
@@ -61,5 +62,5 @@ OpenCLStatus opencl_dropPlatform()
 		platformIds = NULL;
 		numPlatforms = 0;
 	}
-	return SUCCESS;
+	return opencl_success;
 }

@@ -21,7 +21,7 @@
  * afterwards. This is used to not to implemented a parser for OpenCL C
  * parsing.
  */
-int ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes);
 
 /**
@@ -29,14 +29,14 @@ int ocltest_runKernel(void(*kernel)(), unsigned int numDimensions,
  * for the later work group starts. This is needed to get all global
  * combinations running as expected.
  */
-int _runKernel(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus _runKernel(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds, unsigned int currentDimension);
 
 /**
  * This method starts a work group with the given global IDs.
  */
-int _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds);
 
@@ -45,15 +45,15 @@ int _runWorkGroup(void(*kernel)(), unsigned int numDimensions,
  * recursively. This is needed to get all local ID combinations running as
  * expected.
  */
-int _runWorkGroupThreads(void(*kernel)(), unsigned int numDimensions,
-		unsigned int *globalSizes, unsigned int *localSizes,
-		unsigned int *globalIds, unsigned int *localIds,
-		unsigned int currentDimension);
+OpenCLTestStatus _runWorkGroupThreads(void(*kernel)(),
+		unsigned int numDimensions, unsigned int *globalSizes,
+		unsigned int *localSizes, unsigned int *globalIds,
+		unsigned int *localIds, unsigned int currentDimension);
 
 /**
  * This function starts a single POSIX thread for a single work group thread.
  */
-int _runKernelThread(void(*kernel)(), unsigned int numDimensions,
+OpenCLTestStatus _runKernelThread(void(*kernel)(), unsigned int numDimensions,
 		unsigned int *globalSizes, unsigned int *localSizes,
 		unsigned int *globalIds, unsigned int *localIds);
 
