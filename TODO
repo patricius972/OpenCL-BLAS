@@ -1,1 +1,4 @@
-- think about a way to introduce row major and column major OpenCL kernels!
+- think about a better test structure for OpenCL kernels outside of OpenCL to 
+  use standard debuggers
+- re-think the alignment of the OpenCL code within the project to make reuse
+  easier and to avoid duplication
