@@ -46,7 +46,8 @@ foreach $file (`find -type f -name '*.ocl'`) {
 		if (m/^#/) {
 			next;
 		}
-		s/\"/\\"/;
+		s/\\/\\\\"/g;
+		s/\"/\\"/g;
 		print SOURCE "\n";
 		print SOURCE "    \"";
 		print SOURCE;
