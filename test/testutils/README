@@ -1,0 +1,6 @@
+This directory contains additional functions and types for testing. This is
+for helping the tests to become more readable and shorter. The content is not
+installed or shipped outside the source repository.
+
+Rick-Rainer Ludwig
+2011-06-17

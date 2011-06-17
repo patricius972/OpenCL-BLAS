@@ -1,0 +1,6 @@
+This directory contains some work on a OpenCL environment simulator to get the
+OpenCL kernels started outside of OpenCL for debugging purposes. The simulator
+is working with some limitations.
+
+Rick-Rainer Ludwig
+2011-06-17

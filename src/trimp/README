@@ -1,0 +1,5 @@
+This directory contains a trivial implementation (trimp) of BLAS routines to
+use them for testing.
+
+Rick-Rainer Ludwig
+2011-06-17

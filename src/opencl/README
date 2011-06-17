@@ -1,0 +1,5 @@
+This directory contains helper functions and types to use OpenCL in a more
+efficient way. This is the basis for all BLAS routines.
+
+Rick-Rainer Ludwig
+2011-06-17

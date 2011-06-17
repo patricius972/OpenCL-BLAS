@@ -1,0 +1,15 @@
+OpenCL BLAS
+===========
+
+This project is meant to become a CBLAS compatible implementation of BLAS 
+routines on OpenCL devices. The focus will be on compatibility and performance
+to get the whole power of your OpenCL device.
+
+This project is in a very early stage and some tests have to be made to decide
+some architectural questions. If you are interested in contributing to this
+project with expertise and programming, please contact me at: 
+
+    ludwig@puresol-technologies.com
+    
+Rick-Rainer Ludwig
+2011-06-17
