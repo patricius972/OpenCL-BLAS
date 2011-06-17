@@ -1,0 +1,30 @@
+Installation Instructions for OpenCL BLAS
+=========================================
+
+Pre-Requirements
+----------------
+
+0) C/C++ development tools need to be present for compiling and linking. 
+1) OpenCL hardware is needed to run this software. The needed cl/CL.h header 
+   files and the libraries for compiling need to be installed and accessable.
+2) CMake is used to create Makefile files on different platforms.
+3) Perl is needed to create some additional C code source files during 
+   compilation.
+
+Installation Procedure
+----------------------
+
+Just run the following commands in the given order:
+
+1) $ cd <directory where the INSTALL file is> 
+2) $ cmake .
+3) $ make
+4) $ make test
+5) $ su
+6) $ make install
+7) $ exit
+
+If nothing strange happens, you can party!
+
+Rick-Rainer Ludwig
+2011-06-17
