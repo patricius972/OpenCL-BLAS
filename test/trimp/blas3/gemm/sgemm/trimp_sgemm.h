@@ -27,7 +27,6 @@
 #include <stdlib.h>
 
 #include <oclblas/output.h>
-#include <oclblas/types.h>
 
 #include <testutils/compare.h>
 

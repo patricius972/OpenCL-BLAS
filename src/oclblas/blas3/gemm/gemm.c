@@ -6,25 +6,25 @@
  */
 
 /*
-   Copyright 2011 PureSol Technologies
+ Copyright 2011 PureSol Technologies
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 #include "gemm.h"
 
-OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
-		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+OpenCLStatus opencl_sgemm(const MatrixOrder order,
+		const TransposeMatrix transposeA, const TransposeMatrix transposeB,
 		const int m, const int n, const int k, const float alpha, float *a,
 		const int lda, float *b, const int ldb, const float beta, float *c,
 		const int ldc)
@@ -34,11 +34,11 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 
 	cl_device_id usedDevice = deviceIds[1][0];
 
-	cl_context usedContext = clCreateContext(NULL, 1, &usedDevice, NULL, NULL,
-			&ret);
+	cl_context context =
+			clCreateContext(NULL, 1, &usedDevice, NULL, NULL, &ret);
 	ERROR_HANDLER(ret);
 
-	cl_command_queue usedCommandQueue = clCreateCommandQueue(usedContext,
+	cl_command_queue usedCommandQueue = clCreateCommandQueue(context,
 			usedDevice, 0, &ret);
 	ERROR_HANDLER(ret);
 
@@ -46,18 +46,15 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 
 	const int SUBMATRIX_SIZE = 16;
 
-	char definitions[256];
-	sprintf(definitions, "#define SUBMATRIX_SIZE %i\n", SUBMATRIX_SIZE);
-
-	const size_t sizes[] =
-	{ strlen(definitions), strlen(oclFloatMatrix), strlen(oclGetMatrixFloat),
-			strlen(oclSetMatrixFloat), strlen(oclSGEMM) };
 	const char *sources[] =
-	{ definitions, oclFloatMatrix, oclGetMatrixFloat, oclSetMatrixFloat,
-			oclSGEMM };
-	cl_program program = clCreateProgramWithSource(usedContext, 5, sources,
-			sizes, &ret);
-	ERROR_HANDLER(ret);
+	{ oclFloatMatrix, oclGetMatrixFloat, oclSetMatrixFloat, oclSGEMM };
+	cl_program program = createProgramWithSourceStrings(context, 4, sources,
+			&ret);
+	if (ret != CL_SUCCESS)
+	{
+		printPlatformInformation(platformIds[0], stderr, "");
+		ERROR_HANDLER(ret);
+	}
 
 	/* Build Kernel Program */
 	ret = clBuildProgram(program, 1, &usedDevice, NULL, NULL, NULL);
@@ -74,99 +71,25 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	cl_kernel kernel = clCreateKernel(program, "sgemm", &ret);
 	ERROR_HANDLER(ret);
 
-	/* Create Memory Buffer */
-	if (order == ColumnMajor)
+	ERROR_HANDLER(createAndCopyMatrixFloat(context, order, transposeA, m, k, a,
+					lda, CL_MEM_READ_ONLY, &memA));
+	ERROR_HANDLER(createAndCopyMatrixFloat(context, order, transposeB, k, n, b,
+					ldb, CL_MEM_READ_ONLY, &memB));
+	if (beta != 0.0)
 	{
-		if (transposeA == NO)
-		{
-			memA = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					lda * k * sizeof(float), a, &ret);
-			ERROR_HANDLER(ret);
-		}
-		else
-		{
-			memA = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					lda * m * sizeof(float), a, &ret);
-			ERROR_HANDLER(ret);
-		}
-		if (transposeB == NO)
-		{
-			memB = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					ldb * n * sizeof(float), b, &ret);
-			ERROR_HANDLER(ret);
-		}
-		else
-		{
-			memB = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					ldb * k * sizeof(float), b, &ret);
-			ERROR_HANDLER(ret);
-		}
-		if (beta != 0.0)
-		{
-			memC = clCreateBuffer(usedContext,
-					CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-					ldc * n * sizeof(float), c, &ret);
-		}
-		else
-		{
-			memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY,
-					ldc * n * sizeof(float), NULL, &ret);
-		}
-		ERROR_HANDLER(ret);
+		ERROR_HANDLER(createAndCopyMatrixFloat(context, order, NoTranspose, m, n,
+						c, ldc, CL_MEM_READ_WRITE, &memC));
 	}
 	else
 	{
-		if (transposeA == NO)
-		{
-			memA = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					lda * m * sizeof(float), a, &ret);
-			ERROR_HANDLER(ret);
-		}
-		else
-		{
-			memA = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					lda * k * sizeof(float), a, &ret);
-			ERROR_HANDLER(ret);
-		}
-		if (transposeB == NO)
-		{
-			memB = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					ldb * k * sizeof(float), b, &ret);
-			ERROR_HANDLER(ret);
-		}
-		else
-		{
-			memB = clCreateBuffer(usedContext,
-					CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-					ldb * n * sizeof(float), b, &ret);
-			ERROR_HANDLER(ret);
-		}
-		if (beta != 0.0)
-		{
-			memC = clCreateBuffer(usedContext,
-					CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-					ldc * m * sizeof(float), c, &ret);
-		}
-		else
-		{
-			memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY,
-					ldc * m * sizeof(float), NULL, &ret);
-		}
-		ERROR_HANDLER(ret);
+		ERROR_HANDLER(createAndCopyMatrixFloat(context, order, NoTranspose, m, n,
+						NULL, ldc, CL_MEM_WRITE_ONLY, &memC));
 	}
 
 	/* Set OpenCL Kernel Arguments */
 	int colMajor = order == ColumnMajor ? 1 : 0;
-	int transa = transposeA == NO ? 0 : 1;
-	int transb = transposeB == NO ? 0 : 1;
-	unsigned int submatrixSize = SUBMATRIX_SIZE;
+	int transa = transposeA == NoTranspose ? 0 : 1;
+	int transb = transposeB == NoTranspose ? 0 : 1;
 	ERROR_HANDLER(clSetKernelArg(kernel, 0, sizeof(int), (void *) &colMajor));
 	ERROR_HANDLER(clSetKernelArg(kernel, 1, sizeof(int), (void *) &transa));
 	ERROR_HANDLER(clSetKernelArg(kernel, 2, sizeof(int), (void *) &transb));
@@ -181,7 +104,7 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	ERROR_HANDLER(clSetKernelArg(kernel, 11, sizeof(float), (void *) &beta));
 	ERROR_HANDLER(clSetKernelArg(kernel, 12, sizeof(cl_mem), (void *) &memC));
 	ERROR_HANDLER(clSetKernelArg(kernel, 13, sizeof(int), (void *) &ldc));
-	ERROR_HANDLER(clSetKernelArg(kernel, 14, sizeof(unsigned int), &submatrixSize));
+	ERROR_HANDLER(clSetKernelArg(kernel, 14, sizeof(unsigned int), &SUBMATRIX_SIZE));
 	ERROR_HANDLER(clSetKernelArg(kernel, 15, sizeof(cl_float) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
 	ERROR_HANDLER(clSetKernelArg(kernel, 16, sizeof(cl_float) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
 
@@ -228,10 +151,10 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 		clReleaseCommandQueue(usedCommandQueue);
 		usedCommandQueue = NULL;
 	}
-	if (usedContext != NULL)
+	if (context != NULL)
 	{
-		clReleaseContext(usedContext);
-		usedContext = NULL;
+		clReleaseContext(context);
+		context = NULL;
 	}
 
 	if (memA != NULL)
@@ -250,8 +173,8 @@ OpenCLStatus opencl_sgemm(const OCLBMatrixOrder order,
 	return status;
 }
 
-OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
-		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+OpenCLStatus opencl_dgemm(const MatrixOrder order,
+		const TransposeMatrix transposeA, const TransposeMatrix transposeB,
 		const int m, const int n, const int k, const double alpha, double *a,
 		const int lda, double *b, const int ldb, const double beta, double *c,
 		const int ldc)
@@ -261,11 +184,11 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 
 	cl_device_id usedDevice = deviceIds[1][0];
 
-	cl_context usedContext = clCreateContext(NULL, 1, &usedDevice, NULL, NULL,
-			&ret);
+	cl_context context =
+			clCreateContext(NULL, 1, &usedDevice, NULL, NULL, &ret);
 	ERROR_HANDLER(ret);
 
-	cl_command_queue usedCommandQueue = clCreateCommandQueue(usedContext,
+	cl_command_queue usedCommandQueue = clCreateCommandQueue(context,
 			usedDevice, 0, &ret);
 	ERROR_HANDLER(ret);
 
@@ -273,17 +196,10 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 
 	const int SUBMATRIX_SIZE = 16;
 
-	char definitions[256];
-	sprintf(definitions, "#define SUBMATRIX_SIZE %i\n", SUBMATRIX_SIZE);
-
-	const size_t sizes[] =
-	{ strlen(definitions), strlen(oclDoubleMatrix), strlen(oclGetMatrixDouble),
-			strlen(oclSetMatrixDouble), strlen(oclDGEMM) };
 	const char *sources[] =
-	{ definitions, oclFloatMatrix, oclGetMatrixFloat, oclSetMatrixFloat,
-			oclDGEMM };
-	cl_program program = clCreateProgramWithSource(usedContext, 5, sources,
-			sizes, &ret);
+	{ oclFloatMatrix, oclGetMatrixFloat, oclSetMatrixFloat, oclDGEMM };
+	cl_program program = createProgramWithSourceStrings(context, 4, sources,
+			&ret);
 	ERROR_HANDLER(ret);
 
 	/* Build Kernel Program */
@@ -301,31 +217,25 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	cl_kernel kernel = clCreateKernel(program, "dgemm", &ret);
 	ERROR_HANDLER(ret);
 
-	/* Create Memory Buffer */
-	memA = clCreateBuffer(usedContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-			lda * k * sizeof(float), a, &ret);
-	ERROR_HANDLER(ret);
-	memB = clCreateBuffer(usedContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-			ldb * n * sizeof(float), b, &ret);
-	ERROR_HANDLER(ret);
+	ERROR_HANDLER(createAndCopyMatrixDouble(context, order, transposeA, m, k, a,
+					lda, CL_MEM_READ_ONLY, &memA));
+	ERROR_HANDLER(createAndCopyMatrixDouble(context, order, transposeB, k, n, b,
+					ldb, CL_MEM_READ_ONLY, &memB));
 	if (beta != 0.0)
 	{
-		memC = clCreateBuffer(usedContext,
-				CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-				ldc * n * sizeof(float), c, &ret);
+		ERROR_HANDLER(createAndCopyMatrixDouble(context, order, NoTranspose, m, n,
+						c, ldc, CL_MEM_READ_WRITE, &memC));
 	}
 	else
 	{
-		memC = clCreateBuffer(usedContext, CL_MEM_WRITE_ONLY,
-				ldc * n * sizeof(float), NULL, &ret);
+		ERROR_HANDLER(createAndCopyMatrixDouble(context, order, NoTranspose, m, n,
+						NULL, ldc, CL_MEM_WRITE_ONLY, &memC));
 	}
-	ERROR_HANDLER(ret);
 
 	/* Set OpenCL Kernel Arguments */
 	int colMajor = order == ColumnMajor ? 1 : 0;
-	int transa = transposeA == NO ? 0 : 1;
-	int transb = transposeB == NO ? 0 : 1;
-	unsigned int submatrixSize = SUBMATRIX_SIZE;
+	int transa = transposeA == NoTranspose ? 0 : 1;
+	int transb = transposeB == NoTranspose ? 0 : 1;
 	ERROR_HANDLER(clSetKernelArg(kernel, 0, sizeof(int), (void *) &colMajor));
 	ERROR_HANDLER(clSetKernelArg(kernel, 1, sizeof(int), (void *) &transa));
 	ERROR_HANDLER(clSetKernelArg(kernel, 2, sizeof(int), (void *) &transb));
@@ -340,7 +250,7 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	ERROR_HANDLER(clSetKernelArg(kernel, 11, sizeof(float), (void *) &beta));
 	ERROR_HANDLER(clSetKernelArg(kernel, 12, sizeof(cl_mem), (void *) &memC));
 	ERROR_HANDLER(clSetKernelArg(kernel, 13, sizeof(int), (void *) &ldc));
-	ERROR_HANDLER(clSetKernelArg(kernel, 14, sizeof(unsigned int), &submatrixSize));
+	ERROR_HANDLER(clSetKernelArg(kernel, 14, sizeof(unsigned int), &SUBMATRIX_SIZE));
 	ERROR_HANDLER(clSetKernelArg(kernel, 15, sizeof(cl_double) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
 	ERROR_HANDLER(clSetKernelArg(kernel, 16, sizeof(cl_double) * SUBMATRIX_SIZE * SUBMATRIX_SIZE, NULL));
 
@@ -386,10 +296,10 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 		clReleaseCommandQueue(usedCommandQueue);
 		usedCommandQueue = NULL;
 	}
-	if (usedContext != NULL)
+	if (context != NULL)
 	{
-		clReleaseContext(usedContext);
-		usedContext = NULL;
+		clReleaseContext(context);
+		context = NULL;
 	}
 
 	if (memA != NULL)
@@ -408,8 +318,8 @@ OpenCLStatus opencl_dgemm(const OCLBMatrixOrder order,
 	return status;
 }
 
-OpenCLStatus opencl_cgemm(const OCLBMatrixOrder order,
-		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+OpenCLStatus opencl_cgemm(const MatrixOrder order,
+		const TransposeMatrix transposeA, const TransposeMatrix transposeB,
 		const int m, const int n, const int k, const void *alpha, void *a,
 		const int lda, void *b, const int ldb, const void *beta, void *c,
 		const int ldc)
@@ -417,8 +327,8 @@ OpenCLStatus opencl_cgemm(const OCLBMatrixOrder order,
 	return opencl_not_implemented;
 }
 
-OpenCLStatus opencl_zgemm(const OCLBMatrixOrder order,
-		const OCLBTranspose transposeA, const OCLBTranspose transposeB,
+OpenCLStatus opencl_zgemm(const MatrixOrder order,
+		const TransposeMatrix transposeA, const TransposeMatrix transposeB,
 		const int m, const int n, const int k, const void *alpha, void *a,
 		const int lda, void *b, const int ldb, const void *beta, void *c,
 		const int ldc)

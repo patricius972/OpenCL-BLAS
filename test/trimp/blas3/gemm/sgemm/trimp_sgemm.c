@@ -79,7 +79,7 @@ testSgemmColMajorNoTransNoTrans_3x3()
   printf("(Expected)\n");
   printMatrixS(ColumnMajor, 3, 3, e, 3);
 
-  trimp_sgemm(ColumnMajor, NO, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, c, 3);
+  trimp_sgemm(ColumnMajor, NoTranspose, NoTranspose, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, c, 3);
 
   printf("(Actual)\n");
   printMatrixS(ColumnMajor, 3, 3, c, 3);
@@ -149,7 +149,7 @@ testSgemmColMajorTransNoTrans_3x3()
   printf("(Expected)\n");
   printMatrixS(ColumnMajor, 3, 3, e, 3);
 
-  trimp_sgemm(ColumnMajor, YES, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, c, 3);
+  trimp_sgemm(ColumnMajor, Transpose, NoTranspose, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, c, 3);
 
   printf("(Actual)\n");
   printMatrixS(ColumnMajor, 3, 3, c, 3);
@@ -233,7 +233,7 @@ testSgemmColMajorTransNoTrans_3x3_with_lda()
   printf("(Expected)\n");
   printMatrixS(ColumnMajor, 3, 3, e, 3);
 
-  trimp_sgemm(ColumnMajor, YES, NO, 3, 3, 3, 1.0, a, 4, b, 4, 0.0, c, 4);
+  trimp_sgemm(ColumnMajor, Transpose, NoTranspose, 3, 3, 3, 1.0, a, 4, b, 4, 0.0, c, 4);
 
   printf("(Actual)\n");
   printMatrixS(ColumnMajor, 3, 3, c, 4);
@@ -294,7 +294,7 @@ testSgemmColMajorTransNoTrans_2x3_with_lda()
   printf("(Expected)\n");
   printMatrixS(ColumnMajor, 2, 2, e, 2);
 
-  trimp_sgemm(ColumnMajor, YES, NO, 2, 2, 3, 1.0, a, 4, b, 3, 0.0, c, 2);
+  trimp_sgemm(ColumnMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 4, b, 3, 0.0, c, 2);
 
   printf("(Actual)\n");
   printMatrixS(ColumnMajor, 2, 2, c, 2);
@@ -358,7 +358,7 @@ testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
   printf("(Expected)\n");
   printMatrixS(RowMajor, 2, 2, e, 2);
 
-  trimp_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 3, b, 2, 0.0, c, 2);
+  trimp_sgemm(RowMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 3, b, 2, 0.0, c, 2);
 
   printf("(Actual)\n");
   printMatrixS(RowMajor, 2, 2, c, 2);

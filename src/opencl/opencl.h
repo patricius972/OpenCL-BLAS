@@ -33,6 +33,7 @@
 #include <CL/cl.h>
 #endif
 
+#include "opencl_datautils.h"
 #include "opencl_utils.h"
 #include "opencl_platform.h"
 #include "opencl_device.h"

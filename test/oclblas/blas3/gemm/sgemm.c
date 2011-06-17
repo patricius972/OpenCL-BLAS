@@ -6,20 +6,20 @@
  */
 
 /*
-   Copyright 2011 PureSol Technologies
+ Copyright 2011 PureSol Technologies
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 #include "sgemm.h"
 
@@ -58,7 +58,8 @@ int testSgemmColMajorNoTransNoTrans_3x3()
 	b[7] = 8.0;
 	b[8] = 9.0;
 
-	trimp_sgemm(ColumnMajor, NO, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, e, 3);
+	trimp_sgemm(ColumnMajor, NoTranspose, NoTranspose, 3, 3, 3, 1.0, a, 3, b,
+			3, 0.0, e, 3);
 
 	printf("TEST: testDgemmColMajorNoTransNoTrans_3x3()\n");
 	printf("A =\n");
@@ -70,7 +71,8 @@ int testSgemmColMajorNoTransNoTrans_3x3()
 	printf("(Expected)\n");
 	printMatrixS(ColumnMajor, 3, 3, e, 3);
 
-	opencl_sgemm(ColumnMajor, NO, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, c, 3);
+	opencl_sgemm(ColumnMajor, NoTranspose, NoTranspose, 3, 3, 3, 1.0, a, 3, b,
+			3, 0.0, c, 3);
 
 	printf("(Actual)\n");
 	printMatrixS(ColumnMajor, 3, 3, c, 3);
@@ -119,7 +121,8 @@ int testSgemmColMajorTransNoTrans_3x3()
 	b[7] = 8.0;
 	b[8] = 9.0;
 
-	trimp_sgemm(ColumnMajor, YES, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, e, 3);
+	trimp_sgemm(ColumnMajor, Transpose, NoTranspose, 3, 3, 3, 1.0, a, 3, b, 3,
+			0.0, e, 3);
 
 	printf("TEST: testDgemmColMajorTransNoTrans_3x3()\n");
 	printf("A =\n");
@@ -131,7 +134,8 @@ int testSgemmColMajorTransNoTrans_3x3()
 	printf("(Expected)\n");
 	printMatrixS(ColumnMajor, 3, 3, e, 3);
 
-	opencl_sgemm(ColumnMajor, YES, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, c, 3);
+	opencl_sgemm(ColumnMajor, Transpose, NoTranspose, 3, 3, 3, 1.0, a, 3, b, 3,
+			0.0, c, 3);
 
 	printf("(Actual)\n");
 	printMatrixS(ColumnMajor, 3, 3, c, 3);
@@ -194,7 +198,8 @@ int testSgemmColMajorTransNoTrans_3x3_with_lda()
 	b[14] = 0.0;
 	b[15] = 0.0;
 
-	trimp_sgemm(ColumnMajor, YES, NO, 3, 3, 3, 1.0, a, 4, b, 4, 0.0, e, 3);
+	trimp_sgemm(ColumnMajor, Transpose, NoTranspose, 3, 3, 3, 1.0, a, 4, b, 4,
+			0.0, e, 3);
 
 	printf("TEST: testSgemmColMajorTransNoTrans_3x3_with_lda()\n");
 	printf("A =\n");
@@ -206,7 +211,8 @@ int testSgemmColMajorTransNoTrans_3x3_with_lda()
 	printf("(Expected)\n");
 	printMatrixS(ColumnMajor, 3, 3, e, 3);
 
-	opencl_sgemm(ColumnMajor, YES, NO, 3, 3, 3, 1.0, a, 4, b, 4, 0.0, c, 4);
+	opencl_sgemm(ColumnMajor, Transpose, NoTranspose, 3, 3, 3, 1.0, a, 4, b, 4,
+			0.0, c, 4);
 
 	printf("(Actual)\n");
 	printMatrixS(ColumnMajor, 3, 3, c, 4);
@@ -251,7 +257,8 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda()
 	b[4] = 5.0;
 	b[5] = 6.0;
 
-	trimp_sgemm(ColumnMajor, YES, NO, 2, 2, 3, 1.0, a, 4, b, 3, 0.0, e, 2);
+	trimp_sgemm(ColumnMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 4, b, 3,
+			0.0, e, 2);
 
 	printf("TEST: testSgemmColMajorTransNoTrans_2x3_with_lda()\n");
 	printf("A =\n");
@@ -263,7 +270,8 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda()
 	printf("(Expected)\n");
 	printMatrixS(ColumnMajor, 2, 2, e, 2);
 
-	opencl_sgemm(ColumnMajor, YES, NO, 2, 2, 3, 1.0, a, 4, b, 3, 0.0, c, 2);
+	opencl_sgemm(ColumnMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 4, b, 3,
+			0.0, c, 2);
 
 	printf("(Actual)\n");
 	printMatrixS(ColumnMajor, 2, 2, c, 2);
@@ -308,7 +316,8 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
 	b[4] = 5.0;
 	b[5] = 6.0;
 
-	trimp_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 2, b, 2, 0.0, e, 2);
+	trimp_sgemm(RowMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 2, b, 2,
+			0.0, e, 2);
 
 	printf("TEST: testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()\n");
 	printf("A =\n");
@@ -320,7 +329,8 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
 	printf("(Expected)\n");
 	printMatrixS(RowMajor, 2, 2, e, 2);
 
-	opencl_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 2, b, 2, 0.0, c, 2);
+	opencl_sgemm(RowMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 2, b, 2,
+			0.0, c, 2);
 
 	printf("(Actual)\n");
 	printMatrixS(RowMajor, 2, 2, c, 2);

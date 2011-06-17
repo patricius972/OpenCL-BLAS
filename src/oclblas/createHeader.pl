@@ -21,7 +21,7 @@ open HEADER, ">oclStdKernels.h";
 print HEADER "#ifndef OCL_KERNELS_H\n";
 print HEADER "#define OCL_KERNELS_H\n";
 
-foreach $file (`find -type f -name '*.ocl'`) {
+foreach $file (`find kernels -type f -name '*.ocl'`) {
 	chomp $file;
 	$name = $file;
 	$name =~ s/^.*\/([^\/]*)\.ocl$/ocl$1/;

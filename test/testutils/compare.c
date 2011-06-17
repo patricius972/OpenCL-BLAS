@@ -41,7 +41,7 @@ double absD(double d)
 	return d;
 }
 
-int compareMatrixS(const OCLBMatrixOrder order, const int m, const int n, float *a,
+int compareMatrixS(const MatrixOrder order, const int m, const int n, float *a,
 		const int lda, float *b, const int ldb, float accuracy)
 {
 	for (int _m = 0; _m < m; ++_m)
@@ -66,7 +66,7 @@ int compareMatrixS(const OCLBMatrixOrder order, const int m, const int n, float 
 	return 0;
 }
 
-int compareMatrixD(const OCLBMatrixOrder order, const int m, const int n,
+int compareMatrixD(const MatrixOrder order, const int m, const int n,
 		double *a, const int lda, double *b, const int ldb, double accuracy)
 {
 	for (int _m = 0; _m < m; ++_m)

@@ -1,18 +1,18 @@
 /*
-   Copyright 2011 PureSol Technologies
+ Copyright 2011 PureSol Technologies
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		const unsigned int m, const unsigned int n, const unsigned int k,
@@ -37,11 +37,11 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 	{	m, n, colMajor, transc, ldc, c};
 
 	double r = 0.0;
-	for (int i = 0; i < k; i += SUBMATRIX_SIZE)
+	for (int i = 0; i < k; i += submatrixSize)
 	{
-		bufferA[localCol * SUBMATRIX_SIZE + localRow] = getMatrixFloat(A, row,
+		bufferA[localCol * submatrixSize + localRow] = getMatrixFloat(A, row,
 				i + localCol);
-		bufferB[localCol * SUBMATRIX_SIZE + localRow] = getMatrixFloat(B, i
+		bufferB[localCol * submatrixSize + localRow] = getMatrixFloat(B, i
 				+ localRow, col);
 
 		/*
@@ -51,10 +51,10 @@ __kernel void sgemm(const int colMajor, const int transa, const int transb,
 		barrier(CLK_LOCAL_MEM_FENCE);
 
 #pragma unroll
-		for (int j = 0; j < SUBMATRIX_SIZE; ++j)
+		for (int j = 0; j < submatrixSize; ++j)
 		{
-			r += bufferA[j * SUBMATRIX_SIZE + localRow] * bufferB[localCol
-			* SUBMATRIX_SIZE + j];
+			r += bufferA[j * submatrixSize + localRow] * bufferB[localCol
+			* submatrixSize + j];
 		}
 
 		/*

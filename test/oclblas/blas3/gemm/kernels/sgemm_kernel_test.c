@@ -106,7 +106,7 @@ int testSgemmColMajorNoTransNoTrans_3x3()
 	b[7] = 8.0;
 	b[8] = 9.0;
 
-	trimp_sgemm(ColumnMajor, NO, NO, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, e, 3);
+	trimp_sgemm(ColumnMajor, NoTranspose, NoTranspose, 3, 3, 3, 1.0, a, 3, b, 3, 0.0, e, 3);
 
 	printf("TEST: testDgemmColMajorNoTransNoTrans_3x3()\n");
 	printf("A =\n");
@@ -184,7 +184,7 @@ int testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()
 	b[4] = 5.0;
 	b[5] = 6.0;
 
-	trimp_sgemm(RowMajor, YES, NO, 2, 2, 3, 1.0, a, 2, b, 2, 0.0, e, 2);
+	trimp_sgemm(RowMajor, Transpose, NoTranspose, 2, 2, 3, 1.0, a, 2, b, 2, 0.0, e, 2);
 
 	printf("TEST: testSgemmColMajorTransNoTrans_2x3_with_lda_RowMajor()\n");
 	printf("A =\n");
